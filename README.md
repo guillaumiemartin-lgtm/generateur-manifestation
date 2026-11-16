@@ -6,9 +6,19 @@ A generative, procedural animation tool that fills the screen with a crowd of 1-
 
 It is a single HTML file with no build step and no dependencies to install. It runs in any modern browser, on desktop or phone.
 
-The tool is part of **Ball from the Block**, a cyberpunk football video game for the TrimUI Brick handheld. That is why it renders in pure black and white and can export sprite sheets ready to be sliced in a game.
+It renders in pure black and white, and every character can be exported as a sprite sheet ready to be sliced in a game engine or an animation program.
 
 > 🔗 **Live demo:** https://guillaumiemartin-lgtm.github.io/generateur-manifestation/
+
+## Screenshots
+
+**Crowd page** on a landscape tablet: settings on the left, preview on the right.
+
+![Crowd page on a landscape tablet](docs/defile-tablette.png)
+
+**Characters page** on a computer: settings on the left, previews in the middle, library on the right.
+
+![Characters page on a computer](docs/personnages-ordinateur.png)
 
 ## Two pages
 
@@ -109,6 +119,7 @@ Everything runs in your browser. Settings and the character library are stored i
 
 ```
 index.html     the whole tool (HTML + CSS + JavaScript)
+docs/          screenshots used in the README
 README.md      this file (English)
 README.fr.md   French version
 LICENSE        MIT licence

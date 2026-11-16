@@ -6,9 +6,19 @@ Un outil d'animation générative et procédurale qui remplit l'écran d'une fou
 
 C'est un seul fichier HTML, sans compilation ni dépendance à installer. Il fonctionne dans n'importe quel navigateur récent, sur ordinateur comme sur téléphone.
 
-L'outil fait partie de **Ball from the Block**, un jeu vidéo de foot cyberpunk pour la console portable TrimUI Brick. C'est pour cela qu'il dessine en noir et blanc pur et qu'il exporte des planches de sprites prêtes à découper dans un jeu.
+Il dessine en noir et blanc pur, et chaque personnage s'exporte en planche de sprites prête à découper dans un moteur de jeu ou un logiciel d'animation.
 
 > 🔗 **Démo en ligne :** https://guillaumiemartin-lgtm.github.io/generateur-manifestation/
+
+## Captures d'écran
+
+**Page Défilé** sur tablette à l'horizontale : réglages à gauche, aperçu à droite.
+
+![Page Défilé sur tablette à l'horizontale](docs/defile-tablette.png)
+
+**Page Personnages** sur ordinateur : réglages à gauche, aperçus au centre, bibliothèque à droite.
+
+![Page Personnages sur ordinateur](docs/personnages-ordinateur.png)
 
 ## Deux pages
 
@@ -107,6 +117,7 @@ Tout se passe dans ton navigateur. Les réglages et la bibliothèque de personna
 
 ```
 index.html     tout l'outil (HTML + CSS + JavaScript)
+docs/          captures d'écran du README
 README.md      présentation en anglais
 README.fr.md   ce fichier (français)
 LICENSE        licence MIT

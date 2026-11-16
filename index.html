@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Générateur de manifestation · part of Ball from the Block · MIT License © 2026 Martin Guillaumie -->
+<!-- Générateur de manifestation · MIT License © 2026 Martin Guillaumie -->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#0b0b0b">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap" rel="stylesheet">
-<title>Ball from the Block — Générateur de manifestation</title>
+<title>Générateur de manifestation</title>
 <style>
 :root{--bg:#0b0b0b;--panel:#111;--fg:#eee;--dim:#7a7a7a;--line:#262626;--hi:#fff}
 *{box-sizing:border-box}
@@ -141,7 +141,7 @@ input.name{width:120px;padding:5px}
 </head>
 <body class="bg-damier">
 <header>
-  <h1><b>BFTB</b>Générateur de manifestation</h1>
+  <h1><b>MANIF</b>Générateur de manifestation</h1>
   <button class="pri" id="goDefile" title="revenir à la manifestation en plein écran">▶ Défilé</button>
   <span class="tabs" id="sizeTabs" title="taille des personnages = définition (le visage garde des traits de 1 px)"></span>
   <span class="sep"></span>
@@ -187,7 +187,7 @@ input.name{width:120px;padding:5px}
       <div class="grid" id="grid"></div>
     </div>
     <div class="card">
-      <h3>Export pour la Brick (pré-calculé, 1-bit, fond transparent)</h3>
+      <h3>Export (pré-calculé, 1-bit, fond transparent)</h3>
       <div class="toolbar">
         <label>échelle <select id="expScale"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
         <button id="bExpSheet">PNG planche anims</button>
@@ -195,7 +195,7 @@ input.name{width:120px;padding:5px}
         <button id="bExpJson">JSON paramètres</button>
         <button id="bExpZip" class="pri">ZIP complet</button>
       </div>
-      <div class="hint" style="padding:8px 0 0">Planche : une ligne par animation (marche, marche + bras agité), une colonne par image, en boucle. Le JSON décrit frameW/frameH, fps, loop — de quoi découper la planche côté jeu sans rien générer sur la Brick.</div>
+      <div class="hint" style="padding:8px 0 0">Planche : une ligne par animation (marche, marche + bras agité), une colonne par image, en boucle. Le JSON décrit frameW/frameH, fps, loop — de quoi découper la planche dans un jeu ou un logiciel d’animation.</div>
     </div>
   </main>
   <div class="col">
@@ -361,7 +361,7 @@ const SET={W:32,H:48,scale:6,fps:8,frames:8,anim:'walk',outline:true,threeQ:true
 function applyRules(arr){arr.forEach(r=>{const d=DEF[r.k];if(!d)return;if(d.type==='n'){d.lo=r.lo;d.hi=r.hi}else d.allowed=r.allowed.filter(o=>d.opts.includes(o));d.locked=!!r.locked})}
 function rulesJSON(){return DEFS.map(d=>({k:d.k,lo:d.lo,hi:d.hi,allowed:d.allowed,locked:d.locked}))}
 // restore (clé propre à cette copie : ne touche pas l'atelier d'origine)
-(function(){const s=load('bftb-walk-state',null);if(s){if(s.rules)applyRules(s.rules);if(s.V)Object.assign(V,s.V);if(s.SET)Object.assign(SET,s.SET)}})();
+(function(){const s=load('manif-state',null)||load('bftb-walk-state',null);if(s){if(s.rules)applyRules(s.rules);if(s.V)Object.assign(V,s.V);if(s.SET)Object.assign(SET,s.SET)}})();
 /* ---------------- TAILLES ---------------- */
 // Petit / Moyen / Grand : le cadre et toutes les longueurs du gabarit (px) sont multipliés ; les proportions du visage
 // sont relatives et les traits restent à 1 px, donc un grand personnage a plus de définition, pas juste de plus gros pixels.
@@ -376,7 +376,7 @@ function fitSize(vals){const from=vals._sz||1,to=curF();return Math.abs(from-to)
 function applySizeBounds(){const f=curF();for(const d of GAB){d.min=Math.round(GBASE[d.k].min*f);d.max=Math.round(GBASE[d.k].max*f);
  d.lo=clamp(d.lo,d.min,d.max);d.hi=clamp(d.hi,d.min,d.max)}}
 applySizeBounds();if(V._sz==null)V._sz=curF();
-let saveT;function persist(){clearTimeout(saveT);saveT=setTimeout(()=>store('bftb-walk-state',{rules:rulesJSON(),V,SET}),300)}
+let saveT;function persist(){clearTimeout(saveT);saveT=setTimeout(()=>store('manif-state',{rules:rulesJSON(),V,SET}),300)}
 
 const quant=(d,v)=>{const s=d.step;return +(Math.round(v/s)*s).toFixed(4)};
 function randomize(doms,vals=V,rng=rnd){
@@ -697,7 +697,7 @@ function buildPanel(){
   det.appendChild(box);pn.appendChild(det);}
  const rb=mkSec('Préréglages de règles',false);
  const mk=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;b.style.margin='2px';rb.appendChild(b)};
- mk('Exporter règles (.json)',()=>saveFile('bftb-regles-marche.json',new Blob([JSON.stringify({rules:rulesJSON(),SET},null,1)])));
+ mk('Exporter règles (.json)',()=>saveFile('manif-regles.json',new Blob([JSON.stringify({rules:rulesJSON(),SET},null,1)])));
  mk('Importer règles',()=>{importMode='rules';$('fileIn').click()});
  mk('Réinitialiser règles',()=>{applyRules(JSON.parse(DEFAULT_RULES));{const f=curF();for(const d of GAB){d.lo=Math.round(d.lo*f);d.hi=Math.round(d.hi*f)}applySizeBounds()}syncRows();persist();toast('Règles par défaut')});
  mk('Tout déverrouiller',()=>{DEFS.forEach(d=>d.locked=false);syncRows();persist()});
@@ -1006,7 +1006,7 @@ function scaled(src,k){if(k===1)return src;const c=document.createElement('canva
 function sheetFor(vals,k){const N=SET.frames,c=document.createElement('canvas');c.width=SET.W*N;c.height=SET.H*ANIM_KEYS.length;const x=c.getContext('2d');
  ANIM_KEYS.forEach((a,row)=>{for(let f=0;f<N;f++)x.putImageData(toImageData(renderPuppet(vals,SET,a,f/N,boilOf(f),SET.ball)),f*SET.W,row*SET.H)});return scaled(c,k)}
 function portraitFor(vals,k){const P=SET.portRes,c=document.createElement('canvas');c.width=P*3;c.height=P;const x=c.getContext('2d');for(let b=0;b<3;b++)x.putImageData(toImageData(renderPortrait(vals,SET,b)),b*P,0);return scaled(c,k)}
-function metaFor(name,vals,k){const N=SET.frames;return{name,tool:'BFTB générateur de manifestation',sheet:`${name}_anims.png`,portrait:`${name}_portrait.png`,scale:k,frameW:SET.W*k,frameH:SET.H*k,framesPerAnim:N,fps:SET.fps,
+function metaFor(name,vals,k){const N=SET.frames;return{name,tool:'Générateur de manifestation',sheet:`${name}_anims.png`,portrait:`${name}_portrait.png`,scale:k,frameW:SET.W*k,frameH:SET.H*k,framesPerAnim:N,fps:SET.fps,
  anims:Object.fromEntries(ANIM_KEYS.map((a,row)=>[a,{row,label:ANIMS[a].label,frames:N,fps:SET.fps,loop:true,phases:Array.from({length:N},(_,i)=>phaseOf(i,N)),contactFrames:[0,Math.round(N/2)]}])),
  inPlace:true,portraitFrame:{w:SET.portRes*k,h:SET.portRes*k,frames:3,fps:8},facing:'right',colors:{ink:'#000000',paper:'#ffffff',transparent:true},params:vals,
  walk:{stride:SET.stride,knee:SET.knee,armSwing:SET.armSwing,bob:SET.bob},settings:{...SET}}}
@@ -1058,7 +1058,7 @@ async function exportCrowd(){const vis=DF.walkers.filter(w=>{const x0=w.x+rowOff
   files.push(...await walkerFiles(w.vals,anim,base,k,fpsW));
   list.push({file:base,name:w.name,anim,row:w.row,silhouette:w.vals.silhouette||'standard',frames:SET.frames,fps:fpsW,speedFactor:+f.toFixed(3),pxPerCycle:+(w.speed*k).toFixed(2),params:w.vals});
   if(i%10===9)await new Promise(r=>setTimeout(r))}
- files.push(['manifeste.json',new TextEncoder().encode(JSON.stringify({tool:'BFTB générateur de manifestation',date:new Date().toISOString(),scale:k,frameW:SET.W*k,frameH:SET.H*k,
+ files.push(['manifeste.json',new TextEncoder().encode(JSON.stringify({tool:'Générateur de manifestation',date:new Date().toISOString(),scale:k,frameW:SET.W*k,frameH:SET.H*k,
   note:'Chaque passant : un cycle complet sur place. fps = cadence propre du passant ; pxPerCycle = avance horizontale par cycle pour des pieds ancrés.',passants:list},null,1))]);
  saveFile(`manifestation_${vis.length}_passants.zip`,zip(files))}
 function curName(){return($('nameIn').value.trim()||'blk_'+(V.geoSeed>>>0).toString(36)).replace(/[^\w\-]+/g,'_')}
@@ -1078,7 +1078,7 @@ function zip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
  return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/zip'})}
 
 /* ---------------- BIBLIOTHÈQUE ---------------- */
-let LIB=load('bftb-walk-lib',[]);
+let LIB=load('manif-lib',null)||load('bftb-walk-lib',[]);
 function thumb(vals){const s={...SET,portRes:48};const c=document.createElement('canvas');blit(c,renderPortrait(vals,s,0));return c.toDataURL()}
 function renderLib(){const L=$('lib');L.innerHTML='';$('libCount').textContent=LIB.length;
  if(!LIB.length){L.innerHTML='<div class=empty>Rien de gardé pour l’instant. Randomise, puis « Garder » (S) quand un perso te plaît. Tu peux aussi importer le JSON de bibliothèque de l’atelier d’origine.</div>';return}
@@ -1086,11 +1086,11 @@ function renderLib(){const L=$('lib');L.innerHTML='';$('libCount').textContent=L
   d.innerHTML=`<img src="${it.thumb}" title="charger"><div><div class=nm>${it.name}</div><div class=acts><button data-a=load>charger</button><button data-a=zip>zip</button><button data-a=del>✕</button></div></div>`;
   d.querySelector('img').onclick=()=>act('load');d.querySelectorAll('button').forEach(b=>b.onclick=()=>act(b.dataset.a));
   async function act(a){if(a==='load'){pushUndo();V=fitSize({...V,...it.V});$('nameIn').value=it.name;refresh();toast('Chargé : '+it.name)}
-   else if(a==='del'){LIB=LIB.filter(x=>x!==it);store('bftb-walk-lib',LIB);renderLib()}
+   else if(a==='del'){LIB=LIB.filter(x=>x!==it);store('manif-lib',LIB);renderLib()}
    else if(a==='zip'){const k=+$('expScale').value;saveFile(it.name+'.zip',zip(await bundleFiles(it.name,fitSize({...V,...it.V}),k)))}}
   L.appendChild(d)})}
 function keep(){let name=curName();if(LIB.some(x=>x.name===name))name+='_'+(LIB.length+1);
- LIB.push({name,V:{...V},thumb:thumb(V),date:new Date().toISOString()});store('bftb-walk-lib',LIB);renderLib();$('nameIn').value='';toast('Gardé : '+name)}
+ LIB.push({name,V:{...V},thumb:thumb(V),date:new Date().toISOString()});store('manif-lib',LIB);renderLib();$('nameIn').value='';toast('Gardé : '+name)}
 
 /* ---------------- CÂBLAGE ---------------- */
 let importMode='lib';
@@ -1116,15 +1116,15 @@ function init(){
  $('bExpJson').onclick=()=>saveFile(curName()+'.json',new Blob([JSON.stringify(metaFor(curName(),V,k()),null,1)]));
  $('bExpZip').onclick=async()=>saveFile(curName()+'.zip',zip(await bundleFiles(curName(),V,k())));
  $('bLibZip').onclick=async()=>{if(!LIB.length)return toast('Bibliothèque vide');let all=[];for(const it of LIB)all=all.concat(await bundleFiles(it.name,fitSize({...V,...it.V}),k(),it.name+'/'));
-  all.push(['bibliotheque.json',new TextEncoder().encode(JSON.stringify(LIB.map(({thumb,...r})=>r),null,1))]);saveFile('bftb_marche_bibliotheque.zip',zip(all))};
+  all.push(['bibliotheque.json',new TextEncoder().encode(JSON.stringify(LIB.map(({thumb,...r})=>r),null,1))]);saveFile('manif_bibliotheque.zip',zip(all))};
  $('bLibAtlas').onclick=async()=>{if(!LIB.length)return toast('Bibliothèque vide');const P=SET.portRes,cols=Math.ceil(Math.sqrt(LIB.length)),rows=Math.ceil(LIB.length/cols),c=document.createElement('canvas');c.width=cols*P;c.height=rows*P;const x=c.getContext('2d');
   LIB.forEach((it,i)=>x.putImageData(toImageData(renderPortrait(fitSize({...V,...it.V}),SET,0)),(i%cols)*P,Math.floor(i/cols)*P));
-  saveFile('bftb_atlas_portraits.png',await canvasBlob(scaled(c,k())))};
- $('bLibJson').onclick=()=>saveFile('bftb_marche_bibliotheque.json',new Blob([JSON.stringify(LIB.map(({thumb,...r})=>r),null,1)]));
+  saveFile('manif_atlas_portraits.png',await canvasBlob(scaled(c,k())))};
+ $('bLibJson').onclick=()=>saveFile('manif_bibliotheque.json',new Blob([JSON.stringify(LIB.map(({thumb,...r})=>r),null,1)]));
  $('bLibImp').onclick=()=>{importMode='lib';$('fileIn').click()};
  $('fileIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());
   if(importMode==='rules'){if(j.rules)applyRules(j.rules);if(j.SET){Object.assign(SET,j.SET);SET.ball=false;if(!ANIMS[SET.anim])SET.anim='walk';$('animSel').value=SET.anim}buildPanel();refresh();toast('Règles importées')}
-  else{const arr=Array.isArray(j)?j:[j];arr.forEach(it=>{if(it.V||it.params){const v={...V,...(it.V||it.params)};if(v._sz==null)v._sz=1;LIB.push({name:it.name||'import',V:v,thumb:thumb(v),date:it.date||new Date().toISOString()})}});store('bftb-walk-lib',LIB);renderLib();toast(arr.length+' importé(s)')}}catch(err){toast('JSON invalide')}e.target.value=''};
+  else{const arr=Array.isArray(j)?j:[j];arr.forEach(it=>{if(it.V||it.params){const v={...V,...(it.V||it.params)};if(v._sz==null)v._sz=1;LIB.push({name:it.name||'import',V:v,thumb:thumb(v),date:it.date||new Date().toISOString()})}});store('manif-lib',LIB);renderLib();toast(arr.length+' importé(s)')}}catch(err){toast('JSON invalide')}e.target.value=''};
  document.addEventListener('keydown',e=>{if(FS.on){if(e.key===' '&&!e.target.matches('input,select,textarea')){e.preventDefault();$('bPlay').click()}return}if(e.target.matches('input,select,textarea'))return;const K=e.key.toLowerCase();
   if(K==='r')$('bAll').click();else if(K==='f')$('bFace').click();else if(K==='b')$('bBody').click();else if(K==='m')$('bMut').click();
   else if(K==='z')doUndo();else if(K==='s'){e.preventDefault();keep()}else if(K==='g')newGrid();else if(K===' '){e.preventDefault();$('bPlay').click()}
