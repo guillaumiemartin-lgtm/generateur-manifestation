@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<!-- Générateur de manifestation · part of Ball from the Block · MIT License © 2026 Martin Guillaumie -->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Manif">
+<meta name="theme-color" content="#0b0b0b">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap" rel="stylesheet">
+<title>Ball from the Block — Générateur de manifestation</title>
+<style>
+:root{--bg:#0b0b0b;--panel:#111;--fg:#eee;--dim:#7a7a7a;--line:#262626;--hi:#fff}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:12px/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+header{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+h1{font-size:12px;letter-spacing:.25em;margin:0 8px 0 0;text-transform:uppercase;white-space:nowrap}
+h1 b{background:#fff;color:#000;padding:1px 5px;margin-right:6px}
+button,select,input{font:inherit;color:var(--fg);background:#161616;border:1px solid #333;border-radius:0}
+button{padding:5px 9px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:#fff}
+button.pri{background:#fff;color:#000;border-color:#fff}
+button.pri:hover{background:#ccc}
+button kbd{opacity:.5;font-size:10px;margin-left:4px}
+.layout{display:grid;grid-template-columns:360px 1fr 250px;height:calc(100vh - 47px)}
+.col{overflow:auto;border-right:1px solid var(--line)}
+.col:last-child{border-right:0}
+details{border-bottom:1px solid var(--line)}
+summary{padding:8px 12px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.12em;font-size:11px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--dim)}
+details[open]>summary::before{content:'▾'}
+summary .sp{flex:1}
+summary .glock{padding:1px 6px;font-size:10px}
+.rows{padding:2px 12px 10px}
+.row{display:grid;grid-template-columns:86px 1fr 36px 46px 46px 22px;gap:4px;align-items:center;margin:3px 0}
+.row label{color:#bbb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .out{text-align:right;color:#fff}
+.row input[type=number]{width:100%;padding:2px 3px;font-size:10px;color:#9a9a9a}
+.row input[type=range]{width:100%;accent-color:#fff}
+.row.locked label,.row.locked .out{color:var(--dim);text-decoration:line-through}
+.lock{padding:0;width:22px;height:20px;font-size:11px;line-height:1}
+.lock.on{background:#fff;color:#000}
+.erow{margin:6px 0}
+.erow .top{display:grid;grid-template-columns:92px 1fr 22px;gap:4px;align-items:center}
+.erow select{width:100%;padding:2px}
+.chips{display:flex;flex-wrap:wrap;gap:3px;margin:4px 0 0 96px}
+.chip{padding:1px 5px;font-size:10px;border:1px solid #333;color:#666;cursor:pointer;user-select:none}
+.chip.on{color:#fff;border-color:#888}
+.erow.locked label{color:var(--dim);text-decoration:line-through}
+.hint{color:var(--dim);font-size:10px;padding:0 12px 8px}
+.set{display:grid;grid-template-columns:110px 1fr 40px;gap:6px;align-items:center;margin:4px 0}
+.set input[type=range]{accent-color:#fff}
+.checks{display:flex;flex-wrap:wrap;gap:10px;margin:6px 0}
+.checks label{display:flex;gap:4px;align-items:center;cursor:pointer}
+main{padding:12px;display:flex;flex-direction:column;gap:14px}
+.stagewrap{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.card{border:1px solid var(--line);padding:8px;background:var(--panel)}
+.card h3{margin:0 0 6px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);font-weight:normal;display:flex;gap:8px;align-items:center}
+.card h3 .sp{flex:1}
+canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.bg-damier canvas.spr{background:repeating-conic-gradient(#5a5a5a 0 25%,#6a6a6a 0 50%) 0 0/16px 16px}
+.bg-gris canvas.spr{background:#777}
+.bg-blanc canvas.spr{background:#fff}
+.bg-noir canvas.spr{background:#000}
+.bg-gazon canvas.spr{background:repeating-linear-gradient(90deg,#4d4d4d 0 24px,#575757 24px 48px)}
+.toolbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.toolbar .sep{width:1px;height:20px;background:#333;margin:0 4px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.var{border:1px solid var(--line);padding:6px;cursor:pointer;display:flex;justify-content:center;align-items:flex-end;min-height:110px}
+.var:hover{border-color:#fff}
+.lib{padding:10px;display:flex;flex-direction:column;gap:8px}
+.libitem{border:1px solid var(--line);display:grid;grid-template-columns:56px 1fr;gap:8px;padding:6px;align-items:center}
+.libitem:hover{border-color:#555}
+.libitem img{width:56px;height:56px;image-rendering:pixelated;background:#666;cursor:pointer}
+.libitem .nm{font-size:11px;word-break:break-all}
+.libitem .acts{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap}
+.libitem .acts button{padding:2px 5px;font-size:10px}
+.libtools{display:flex;flex-wrap:wrap;gap:4px}
+.libtools button{font-size:10px;padding:3px 6px}
+input.name{width:120px;padding:5px}
+#toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:6px 12px;display:none;z-index:9;font-size:11px}
+.sideh{padding:10px;border-bottom:1px solid var(--line);text-transform:uppercase;letter-spacing:.15em;font-size:11px;display:flex;justify-content:space-between}
+.empty{color:var(--dim);font-size:11px;padding:6px 0}
+#phases{display:flex;margin-top:4px;color:var(--dim);font-size:9px;text-transform:uppercase;letter-spacing:.05em}
+#phases span{text-align:center;overflow:hidden;white-space:nowrap}
+#phases span.cur{color:#fff}
+#fs{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;touch-action:manipulation}
+#fs[hidden]{display:none!important}
+/* scène : un seul canvas à la résolution de sortie (fond + foule + titre), affiché réduit si besoin */
+#fsCanvas{display:none}
+#fsStageWrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#fsStage{display:block;flex:none;image-rendering:pixelated;image-rendering:crisp-edges}
+#fsStage.smooth{image-rendering:auto}
+#fsResLbl{display:none}
+.wide-only{display:none!important}
+/* grand écran (tablette horizontale, ordinateur) : réglages à gauche, aperçu à droite */
+#fs.wide{display:grid;grid-template-columns:min(380px,36vw) 1fr;grid-template-rows:100%;align-items:stretch;justify-content:stretch;background:#0b0b0b}
+.grp{display:inline-flex;align-items:center;gap:4px}
+#fs.wide #fsBar>.grp,#fs.wide #fsBar>label,#fs.wide #fsBar>.wide-only{width:100%}
+#fs.wide .wide-only{display:inline-flex!important;align-items:center;gap:4px}
+#fs.wide #fsStageWrap{position:relative;inset:auto;grid-column:2;grid-row:1;margin:18px;background:repeating-conic-gradient(#141414 0 25%,#191919 0 50%) 0 0/24px 24px}
+#fs.wide #fsStage{box-shadow:0 0 0 1px #444}
+#fs.wide #fsResLbl{display:block;position:absolute;right:8px;bottom:6px;font-size:10px;color:#888;background:rgba(0,0,0,.6);padding:2px 6px}
+#fs.wide #fsBar{position:relative;inset:auto;grid-column:1;grid-row:1;max-height:none;height:100vh;overflow:auto;align-content:flex-start;background:#111;border-right:1px solid #262626;padding:12px;opacity:1;pointer-events:auto}
+#fs.wide #fsBar.hide{opacity:1;pointer-events:auto}
+#fs.wide #fsFold,#fs.wide #fsMini{display:none}
+#fs.wide #fsBar .toolbar label{display:flex;align-items:center;gap:6px;width:100%;white-space:nowrap}
+#fs.wide #fsBar .toolbar input[type=range]{flex:1;width:auto!important}
+#fs.wide #fsBar .toolbar label>span{min-width:30px;text-align:right}
+#fs.wide #fsBar #dfCtrls{border-top:1px solid #262626;margin-top:6px;padding-top:4px}
+#fsBar{position:absolute;bottom:max(8px,env(safe-area-inset-bottom));left:8px;right:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:rgba(0,0,0,.75);color:#fff;padding:6px 8px;transition:opacity .3s}
+#fsBar.hide{opacity:0;pointer-events:none}
+#fsBar.mini{right:auto;padding:4px 8px;background:rgba(0,0,0,.45)}
+#fsBar.mini>:not(#fsFold):not(#fsMini){display:none}
+#fsMini:empty{display:none}
+#fsMini label{white-space:nowrap}
+#fsMini input[type=range]{width:min(52vw,320px)!important}
+#fsBar{max-height:72vh;overflow:auto}
+#fsBar #dfCtrls{flex-basis:100%}
+#fsBar #dfCtrls.closed{display:none}
+#fsBar .toolbar label{white-space:nowrap}
+#fsBar button,#fsBar select,#fsBar input{background:rgba(22,22,22,.8)}
+#fsBar button.pri,#fsBar .tabs button.on{background:#fff;color:#000;border-color:#fff}
+#fsBar input[type=color]{width:34px;height:26px;padding:0;border:1px solid #555;background:none}
+.tabs{display:flex}
+.tabs button{border-right-width:0}.tabs button:last-child{border-right-width:1px}
+.tabs button.on{background:#fff;color:#000}
+.tabs small{opacity:.55;margin-left:4px;font-size:10px}
+@media(max-width:1300px){.layout{grid-template-columns:330px 1fr;grid-template-rows:auto 1fr;height:calc(100vh - 47px)}
+ .layout>.col:nth-child(1){grid-row:1/3}.layout>.col:nth-child(3){grid-column:2;border-top:1px solid var(--line)}
+ .layout>main.col{overflow:auto}}
+@media(max-width:1300px) and (min-width:760px){.layout{grid-template-rows:1fr auto}.layout>.col:nth-child(3){max-height:34vh}}
+@media(max-width:759px),(orientation:portrait) and (max-width:1100px){.layout{grid-template-columns:1fr;grid-template-rows:none;height:auto}
+ .layout>.col:nth-child(1),.layout>.col:nth-child(3){grid-row:auto;grid-column:auto;max-height:none}
+ .col{border-right:0;border-bottom:1px solid var(--line);overflow:visible}}
+</style>
+</head>
+<body class="bg-damier">
+<header>
+  <h1><b>BFTB</b>Générateur de manifestation</h1>
+  <button class="pri" id="goDefile" title="revenir à la manifestation en plein écran">▶ Défilé</button>
+  <span class="tabs" id="sizeTabs" title="taille des personnages = définition (le visage garde des traits de 1 px)"></span>
+  <span class="sep"></span>
+  <button class="pri" id="bAll" title="Tout randomiser selon les règles">🎲 Tout<kbd>R</kbd></button>
+  <button id="bFace">🎲 Visage<kbd>F</kbd></button>
+  <button id="bBody">🎲 Corps<kbd>B</kbd></button>
+  <button id="bMut">Muter<kbd>M</kbd></button>
+  <button id="bUndo">↶<kbd>Z</kbd></button>
+  <span class="sep"></span>
+  <input class="name" id="nameIn" placeholder="nom (auto)">
+  <button class="pri" id="bKeep">Garder<kbd>S</kbd></button>
+</header>
+<div class="layout">
+  <div class="col" id="panel"></div>
+  <main class="col">
+    <div class="stagewrap">
+      <div class="card">
+        <h3>Marionnette <span class="sp"></span><span id="frameLbl"></span></h3>
+        <canvas id="stage" class="spr"></canvas>
+        <div class="toolbar" style="margin-top:8px">
+          <select id="animSel"></select>
+          <button id="bPlay">⏸<kbd>␣</kbd></button>
+          <button id="bPrev">−1</button>
+          <button id="bStep">+1</button>
+          <span id="phaseLbl" style="color:#bbb"></span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Portrait <span class="sp"></span><span id="portLbl"></span></h3>
+        <canvas id="portrait" class="spr"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Planche — <span id="stripLbl"></span></h3>
+      <canvas id="strip" class="spr"></canvas>
+      <div id="phases"></div>
+    </div>
+    <div class="card">
+      <h3>Variantes (clic = adopter) <span class="sp"></span>
+        <select id="gridMode"><option value="face">visages</option><option value="body">corps</option><option value="all">tout</option><option value="mutate">mutations</option></select>
+        <button id="bGrid">Nouvelle grille<kbd>G</kbd></button>
+      </h3>
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="card">
+      <h3>Export pour la Brick (pré-calculé, 1-bit, fond transparent)</h3>
+      <div class="toolbar">
+        <label>échelle <select id="expScale"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <button id="bExpSheet">PNG planche anims</button>
+        <button id="bExpPort">PNG portrait (boil)</button>
+        <button id="bExpJson">JSON paramètres</button>
+        <button id="bExpZip" class="pri">ZIP complet</button>
+      </div>
+      <div class="hint" style="padding:8px 0 0">Planche : une ligne par animation (marche, marche + bras agité), une colonne par image, en boucle. Le JSON décrit frameW/frameH, fps, loop — de quoi découper la planche côté jeu sans rien générer sur la Brick.</div>
+    </div>
+  </main>
+  <div class="col">
+    <div class="sideh"><span>Bibliothèque</span><span id="libCount">0</span></div>
+    <div class="lib">
+      <div class="libtools">
+        <button id="bLibZip">ZIP tout</button>
+        <button id="bLibAtlas">Atlas portraits</button>
+        <button id="bLibJson">Export JSON</button>
+        <button id="bLibImp">Import JSON</button>
+        <input type="file" id="fileIn" accept=".json" style="display:none">
+      </div>
+      <div id="lib"></div>
+    </div>
+  </div>
+</div>
+<div id="fs" hidden>
+  <div id="fsStageWrap"><canvas id="fsStage"></canvas><div id="fsResLbl"></div></div>
+  <canvas id="fsCanvas"></canvas>
+  <div id="fsBar">
+    <button id="fsFold" title="replier la barre : seul le curseur du nombre de passants reste visible">▾ replier</button>
+    <span id="fsMini"></span>
+    <label class="wide-only">résolution <select id="fsRes">
+      <option value="ecran">taille de l'aperçu</option><option value="1920x1080">1920×1080 · 16:9</option><option value="1280x720">1280×720 · 16:9</option>
+      <option value="3840x2160">3840×2160 · 4K</option><option value="1080x1920">1080×1920 · vertical</option><option value="1080x1350">1080×1350 · 4:5</option>
+      <option value="1080x1080">1080×1080 · carré</option><option value="custom">personnalisée…</option></select></label>
+    <span class="wide-only" id="fsResCustom"><input type=number id="fsResW" min=64 max=7680 style="width:64px">×<input type=number id="fsResH" min=64 max=7680 style="width:64px"></span>
+    <label>fond <input type=color id="fsBg"></label>
+    <span class="grp"><span>taille</span><button id="fsMinus">−</button><span id="fsScaleO"></span><button id="fsPlus">+</button><button id="fsAuto" title="la foule prend environ un tiers de la hauteur">auto</button></span>
+    <label>position <select id="fsPos"><option value="flex-start">haut</option><option value="center">centre</option><option value="flex-end">bas</option></select></label>
+    <label><input type=checkbox id="fsGround"> sol</label>
+    <span class="grp"><label><input type=checkbox id="fsTitleOn"> titre</label>
+    <input id="fsTitleTxt" style="width:190px;padding:3px">
+    <input type=color id="fsTitleCol" title="couleur du titre"></span>
+    <button id="fsMore" title="afficher / masquer les réglages de la foule">⚙ foule ▾</button>
+    <span style="flex:1"></span>
+    <button id="fsClose" title="régler et créer les personnages">👤 Personnages</button>
+    <div id="dfCtrls">
+      <span id="dfLbl" style="display:block;font-size:10px;color:#aaa;margin:2px 0 4px"></span>
+      <div class="toolbar" style="margin-top:8px">
+        <label>passants <select id="dfSrc"><option value="rand">aléatoires (règles du 🎲)</option><option value="lib">bibliothèque</option><option value="cur">perso actuel</option></select></label>
+        <label title="1 = pieds ancrés au sol">vitesse <input type=range id="dfSpeed" min=0.5 max=1.5 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfSpeedO"></span></label>
+                <button id="dfSkip">Tout renouveler ⏭</button>
+      </div>
+      <div class="toolbar" style="margin-top:6px">
+        <label>passants <input type=range id="dfN" min=1 max=200 step=1 style="width:80px;accent-color:#fff"> <span id="dfNO"></span></label>
+        <label>rangées <input type=range id="dfRows" min=1 max=8 step=1 style="width:60px;accent-color:#fff"> <span id="dfRowsO"></span></label>
+        <label title="écart vertical entre deux rangées (px) ; plus petit que la hauteur du sprite = rangées qui se chevauchent">décalage ↕ <input type=range id="dfRowY" min=2 max=80 step=1 style="width:70px;accent-color:#fff"> <span id="dfRowYO"></span></label>
+        <label title="décalage horizontal de chaque rangée par rapport à la précédente (px)">décalage ↔ <input type=range id="dfRowX" min=-64 max=64 step=1 style="width:70px;accent-color:#fff"> <span id="dfRowXO"></span></label>
+        <label title="variation aléatoire de cadence de chaque passant (±%) ; les pieds restent ancrés">vitesse aléa ± <input type=range id="dfVar" min=0 max=0.6 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfVarO"></span></label>
+        <label title="chaque passant varie autour des réglages de marche : pas, genou, bras, affaissement, hauteur et rythme du bras levé">variété démarche <input type=range id="dfGait" min=0 max=1 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfGaitO"></span></label>
+        <label title="part des passants qui agitent un bras en l'air">bras levé <input type=range id="dfWave" min=0 max=1 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfWaveO"></span></label>
+        <label title="part des bras levés qui tiennent une pancarte (bâton + rectangle)">pancartes <input type=range id="dfSign" min=0 max=1 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfSignO"></span></label>
+        <label title="part des passants aléatoires à silhouette féminine (jupe, taille fine, cheveux longs)">féminines <input type=range id="dfFem" min=0 max=1 step=0.05 style="width:70px;accent-color:#fff"> <span id="dfFemO"></span></label>
+      </div>
+      <div class="toolbar" style="margin-top:6px">
+        <span class="tabs" id="fsSizeTabs" title="taille des personnages (définition)"></span>
+        <label>images/cycle <input type=range id="fsFrames" min=4 max=16 step=1 style="width:70px;accent-color:#fff"> <span id="fsFramesO"></span></label>
+        <label>fps <input type=range id="fsFps" min=2 max=24 step=1 style="width:70px;accent-color:#fff"> <span id="fsFpsO"></span></label>
+        <label>pas <input type=range id="fsStride" min=0.3 max=1.6 step=0.05 style="width:70px;accent-color:#fff"> <span id="fsStrideO"></span></label>
+        <label>genou <input type=range id="fsKnee" min=0.3 max=1.8 step=0.05 style="width:70px;accent-color:#fff"> <span id="fsKneeO"></span></label>
+        <label>bras <input type=range id="fsArm" min=0 max=1.8 step=0.05 style="width:70px;accent-color:#fff"> <span id="fsArmO"></span></label>
+        <label>affaissement <input type=range id="fsBob" min=0 max=2 step=1 style="width:70px;accent-color:#fff"> <span id="fsBobO"></span></label>
+        <button id="fsReal" title="plein écran du navigateur (masque ses barres)">⛶ plein écran</button>
+      </div>
+      <div class="toolbar" style="margin-top:10px;padding-top:8px;border-top:1px solid #333">
+        <button id="dfExp" class="pri" title="un cycle de marche complet par passant visible : GIF animé + planche PNG, plus manifeste.json, dans un ZIP">⇩ Télécharger</button>
+        <label>échelle <select id="fsExpScale"><option>1</option><option>2</option><option>3</option><option>4</option></select></label>
+        <span style="color:#aaa;font-size:10px">un GIF animé + une planche PNG par passant visible, dans un ZIP</span>
+      </div>
+      <div class="toolbar" style="margin-top:6px">
+        <button id="fsShot" title="image de la scène entière, à la résolution de sortie">📷 Image</button>
+        <button id="fsRec" title="vidéo de la scène entière, à la résolution de sortie (MP4 ou WebM selon le navigateur)">● Vidéo</button>
+        <label>durée <select id="fsRecDur"><option value="5">5 s</option><option value="10">10 s</option><option value="20">20 s</option><option value="30">30 s</option><option value="60">60 s</option></select></label>
+        <span id="fsOutLbl" style="color:#aaa;font-size:10px"></span>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+<script>
+'use strict';
+const TAU=Math.PI*2,D2R=Math.PI/180;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v,lerp=(a,b,t)=>a+(b-a)*t;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=()=>Math.random();
+const $=id=>document.getElementById(id);
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display='none',1800)}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+
+/* ---------------- PARAMÈTRES & RÈGLES ---------------- */
+const GROUPS=[
+ {id:'gabarit',label:'Gabarit (blocs, px)',dom:'body'},
+ {id:'style',label:'Style (maillot…)',dom:'body'},
+ {id:'tete',label:'Tête — géométrie',dom:'face'},
+ {id:'yeux',label:'Yeux',dom:'face'},
+ {id:'nez',label:'Nez & sourcils',dom:'face'},
+ {id:'bouche',label:'Bouche',dom:'face'},
+ {id:'extras',label:'Extras cyber',dom:'face'},
+];
+const DEFS=[];
+function N(g,k,label,min,max,step,v,lo,hi){DEFS.push({type:'n',g,k,label,min,max,step,v,lo:lo??min,hi:hi??max,locked:false})}
+function E(g,k,label,opts,v,allowed){DEFS.push({type:'e',g,k,label,opts,v,allowed:allowed?[...allowed]:[...opts],locked:false})}
+N('gabarit','headW','Tête L',4,28,1,10,8,13);
+N('gabarit','headH','Tête H',4,28,1,11,8,13);
+N('gabarit','neck','Cou',0,6,1,1,0,2);
+N('gabarit','torsoW','Torse L',3,20,1,8,6,11);
+N('gabarit','torsoH','Torse H',3,24,1,11,9,13);
+N('gabarit','armUp','Bras',2,14,1,6,5,7);
+N('gabarit','armLow','Avant-bras',2,14,1,6,5,7);
+N('gabarit','armW','Bras épaisseur',1,7,1,3,2,4);
+N('gabarit','hand','Main',1,7,1,3,2,3);
+N('gabarit','legUp','Cuisse',2,16,1,7,6,9);
+N('gabarit','legLow','Tibia',2,16,1,7,6,9);
+N('gabarit','legW','Jambe épaisseur',1,8,1,4,3,5);
+N('gabarit','footL','Pied L',2,12,1,5,4,6);
+N('gabarit','footH','Pied H',1,5,1,2,2,2);
+N('gabarit','lean','Inclinaison °',-10,25,1,3,0,8);
+E('style','torsoFill','Maillot',['white','black','dither','stripes','hoops'],'white');
+E('style','armFill','Manches',['white','black','dither'],'white');
+E('style','legFill','Short',['white','black','dither'],'black');
+E('style','sockFill','Chaussettes',['white','black','dither','hoops'],'white');
+E('style','footFill','Crampons',['white','black'],'black');
+E('style','hairFill','Cheveux',['black','dither','white'],'black');
+E('style','backFill','Membres arrière',['same','dither','black'],'dither');
+E('style','silhouette','Silhouette',['standard','feminine'],'standard');
+N('tete','shapeN','Rond → carré',1.3,8,0.1,3,2,5);
+N('tete','verts','Sommets',4,28,1,12,6,18);
+N('tete','jitter','Irrégularité',0,0.3,0.01,0.07,0,0.14);
+N('tete','taper','Menton',-0.5,0.6,0.01,0.12,-0.1,0.35);
+N('tete','boil','Tremblé (boil)',0,0.08,0.005,0.015,0,0.03);
+N('yeux','eyeY','Hauteur',0.2,0.65,0.01,0.42,0.32,0.5);
+N('yeux','eyeSp','Écart',0.05,0.42,0.01,0.2,0.13,0.28);
+N('yeux','eyeS','Taille',0.03,0.26,0.005,0.1,0.07,0.15);
+N('yeux','eyeAsym','Asymétrie',0,1,0.01,0.25,0,0.55);
+E('yeux','eyeType','Type',['dot','ring','pupil','line','cross','square','visor','mono'],'pupil',['dot','ring','pupil','line','square','visor']);
+N('yeux','pupil','Pupille',0.2,0.85,0.01,0.45,0.3,0.6);
+N('yeux','lookX','Regard X',-1,1,0.05,0.3,-0.6,0.8);
+N('yeux','lookY','Regard Y',-1,1,0.05,0,-0.5,0.5);
+E('nez','brow','Sourcils',['none','flat','angry','sad','uni'],'flat');
+E('nez','nose','Nez',['none','line','L','dots','block'],'L');
+N('nez','noseL','Nez longueur',0.03,0.28,0.01,0.1,0.06,0.16);
+N('bouche','mouthY','Hauteur',0.52,0.94,0.01,0.75,0.66,0.84);
+N('bouche','mouthW','Largeur',0.05,0.75,0.01,0.3,0.16,0.45);
+N('bouche','mouthX','Décalage X',-0.22,0.22,0.01,0.03,-0.08,0.1);
+N('bouche','mouthTilt','Inclinaison',-0.45,0.45,0.01,0,-0.15,0.15);
+N('bouche','mouthOpen','Ouverture',0,0.28,0.01,0.06,0.02,0.12);
+E('bouche','mouthType','Type',['line','wobble','oval','teeth','zigzag','smile','frown','grille'],'wobble');
+E('extras','hair','Coiffure',['none','mohawk','flat','spikes','buzz','bun','long'],'mohawk',['none','mohawk','flat','spikes','buzz','bun']);
+N('extras','hairH','Hauteur cheveux',0.05,0.7,0.01,0.3,0.15,0.45);
+E('extras','ears','Oreilles',['none','round','square','cyber'],'round');
+E('extras','implant','Implant',['none','plate','eyepatch','lens','barcode','jack'],'none');
+E('extras','antenna','Antenne',['none','single','double'],'none');
+E('extras','scar','Cicatrice',['none','cheek','eye'],'none');
+const DEF={};DEFS.forEach(d=>DEF[d.k]=d);
+const DEFAULT_RULES=JSON.stringify(DEFS.map(d=>({k:d.k,lo:d.lo,hi:d.hi,allowed:d.allowed,locked:false})));
+
+let V={};DEFS.forEach(d=>V[d.k]=d.v);V.geoSeed=12345;
+const SET={W:32,H:48,scale:6,fps:8,frames:8,anim:'walk',outline:true,threeQ:true,ball:false,portRes:64,shoulders:true,bg:'damier',
+ stride:1,knee:1,armSwing:1,bob:1,onion:false,dfW:200,dfSpeed:1,dfSrc:'rand',dfN:3,dfRows:1,dfRowY:14,dfRowX:0,dfVar:0.15,dfWave:0.25,dfFem:0.4,dfSign:0.4,dfGait:0.5,size:'petit',fsBg:'#1a1a1a',fsScale:0,fsPos:'flex-end',fsGround:false,fsTitleOn:true,fsTitle:'Bismillah c’est les ténèbres',fsTitleCol:'#ffffff',fsMore:true,fsFold:false,res:'ecran',resW:1920,resH:1080,recDur:10};
+
+function applyRules(arr){arr.forEach(r=>{const d=DEF[r.k];if(!d)return;if(d.type==='n'){d.lo=r.lo;d.hi=r.hi}else d.allowed=r.allowed.filter(o=>d.opts.includes(o));d.locked=!!r.locked})}
+function rulesJSON(){return DEFS.map(d=>({k:d.k,lo:d.lo,hi:d.hi,allowed:d.allowed,locked:d.locked}))}
+// restore (clé propre à cette copie : ne touche pas l'atelier d'origine)
+(function(){const s=load('bftb-walk-state',null);if(s){if(s.rules)applyRules(s.rules);if(s.V)Object.assign(V,s.V);if(s.SET)Object.assign(SET,s.SET)}})();
+/* ---------------- TAILLES ---------------- */
+// Petit / Moyen / Grand : le cadre et toutes les longueurs du gabarit (px) sont multipliés ; les proportions du visage
+// sont relatives et les traits restent à 1 px, donc un grand personnage a plus de définition, pas juste de plus gros pixels.
+const SIZES={petit:{f:1,label:'Petit'},moyen:{f:1.5,label:'Moyen'},grand:{f:2,label:'Grand'}};
+if(!SIZES[SET.size])SET.size='petit';
+const GAB=DEFS.filter(d=>d.g==='gabarit'&&d.k!=='lean');
+const GBASE={};GAB.forEach(d=>GBASE[d.k]={min:d.min,max:d.max});
+const curF=()=>SIZES[SET.size].f;
+function scaleVals(vals,r){const o={...vals};for(const d of GAB)o[d.k]=Math.max(GBASE[d.k].min,Math.round(o[d.k]*r));return o}
+// ramène un perso (bibliothèque, import…) à la taille courante
+function fitSize(vals){const from=vals._sz||1,to=curF();return Math.abs(from-to)<1e-6?{...vals,_sz:to}:{...scaleVals(vals,to/from),_sz:to}}
+function applySizeBounds(){const f=curF();for(const d of GAB){d.min=Math.round(GBASE[d.k].min*f);d.max=Math.round(GBASE[d.k].max*f);
+ d.lo=clamp(d.lo,d.min,d.max);d.hi=clamp(d.hi,d.min,d.max)}}
+applySizeBounds();if(V._sz==null)V._sz=curF();
+let saveT;function persist(){clearTimeout(saveT);saveT=setTimeout(()=>store('bftb-walk-state',{rules:rulesJSON(),V,SET}),300)}
+
+const quant=(d,v)=>{const s=d.step;return +(Math.round(v/s)*s).toFixed(4)};
+function randomize(doms,vals=V,rng=rnd){
+ const o={...vals};
+ for(const d of DEFS){const g=GROUPS.find(x=>x.id===d.g);if(!doms.includes(g.dom)||d.locked)continue;
+  if(d.type==='n')o[d.k]=quant(d,lerp(d.lo,d.hi,rng()));
+  else if(d.allowed.length)o[d.k]=d.allowed[Math.floor(rng()*d.allowed.length)];}
+ if(doms.includes('face')&&!DEF.verts.locked)o.geoSeed=Math.floor(rng()*1e9);
+ if(o.silhouette==='feminine'&&doms.includes('face')&&!DEF.hair.locked&&rng()<.8)o.hair=rng()<.8?'long':'bun';
+ return o;
+}
+// rend un perso féminin (jupe, taille fine, membres plus fins, cheveux longs le plus souvent)
+function feminize(v,rng=rnd){const o={...v,silhouette:'feminine'};if(!DEF.hair.locked&&rng()<.85)o.hair=rng()<.8?'long':'bun';return o}
+function standardize(v){const o={...v,silhouette:'standard'};if(o.hair==='long'&&!DEF.hair.locked)o.hair='flat';return o}
+function mutate(vals=V,amt=0.12,rng=rnd){
+ const o={...vals};
+ for(const d of DEFS){if(d.locked)continue;
+  if(d.type==='n'){o[d.k]=quant(d,clamp(o[d.k]+(rng()*2-1)*amt*(d.hi-d.lo||d.step),Math.min(d.lo,d.hi),Math.max(d.lo,d.hi)));}
+  else if(rng()<0.08&&d.allowed.length)o[d.k]=d.allowed[Math.floor(rng()*d.allowed.length)];}
+ if(rng()<0.25&&!DEF.verts.locked)o.geoSeed=Math.floor(rng()*1e9);
+ return o;
+}
+
+/* ---------------- RASTER 1-BIT ---------------- */
+const INK=2,PAPER=1;
+function inPoly(p,x,y){let c=false;for(let i=0,j=p.length-1;i<p.length;j=i++){const xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))c=!c}return c}
+const S={
+ poly(p){let a=1e9,b=1e9,c=-1e9,d=-1e9;for(const q of p){a=Math.min(a,q[0]);b=Math.min(b,q[1]);c=Math.max(c,q[0]);d=Math.max(d,q[1])}return{bb:[a,b,c,d],t:(x,y)=>inPoly(p,x,y),cx:(a+c)/2,cy:(b+d)/2}},
+ ell(cx,cy,rx,ry){rx=Math.max(rx,.5);ry=Math.max(ry??rx,.5);return{bb:[cx-rx,cy-ry,cx+rx,cy+ry],t:(x,y)=>((x-cx)/rx)**2+((y-cy)/ry)**2<=1.0001,cx,cy}},
+ ring(cx,cy,r,th){th=Math.max(th,1.05);const ri=r-th;return{bb:[cx-r,cy-r,cx+r,cy+r],t:(x,y)=>{const d=Math.hypot(x-cx,y-cy);return d<=r+.05&&d>ri},cx,cy}},
+ line(x0,y0,x1,y1,th=1){const h=Math.max(th/2,.6),dx=x1-x0,dy=y1-y0,L2=dx*dx+dy*dy||1e-9;return{bb:[Math.min(x0,x1)-h,Math.min(y0,y1)-h,Math.max(x0,x1)+h,Math.max(y0,y1)+h],t:(x,y)=>{let u=((x-x0)*dx+(y-y0)*dy)/L2;u=clamp(u,0,1);return Math.hypot(x-x0-u*dx,y-y0-u*dy)<=h},cx:(x0+x1)/2,cy:(y0+y1)/2}},
+ box(px,py,dx,dy,L,W,e0=0,e1=0){const hw=Math.max(W/2,.55),nx=-dy,ny=dx;const c=[[-e0,-hw],[L+e1,-hw],[L+e1,hw],[-e0,hw]].map(([a,p])=>[px+dx*a+nx*p,py+dy*a+ny*p]);const sh=S.poly(c);sh.t=(x,y)=>{const vx=x-px,vy=y-py,a=vx*dx+vy*dy,p=vx*nx+vy*ny;return a>=-e0&&a<=L+e1&&Math.abs(p)<=hw};sh.corners=c;return sh},
+ rect(x,y,w,h){return S.poly([[x,y],[x+w,y],[x+w,y+h],[x,y+h]])},
+};
+class Ras{
+ constructor(w,h){this.w=w;this.h=h;this.id=new Uint8Array(w*h);this.c=new Uint8Array(w*h);this.clip=null}
+ scan(sh,write){const[a,b,c,d]=sh.bb;const x0=Math.max(0,Math.floor(a)),y0=Math.max(0,Math.floor(b)),x1=Math.min(this.w-1,Math.ceil(c)),y1=Math.min(this.h-1,Math.ceil(d));let n=0;
+  for(let y=y0;y<=y1;y++)for(let x=x0;x<=x1;x++)if(sh.t(x+.5,y+.5)&&write(y*this.w+x))n++;
+  if(!n){const x=Math.floor(sh.cx),y=Math.floor(sh.cy);if(x>=0&&y>=0&&x<this.w&&y<this.h)write(y*this.w+x)}}
+ sil(sh,id){this.scan(sh,i=>{this.id[i]=id;return true})}
+ ink(sh,col=INK){this.scan(sh,i=>{if(this.clip&&!this.clip.has(this.id[i]))return false;this.c[i]=col;return true})}
+}
+function fillCol(st,x,y){switch(st){case'white':return PAPER;case'black':return INK;case'dither':return((x+y)&1)?INK:PAPER;case'stripes':return((x>>1)&1)?INK:PAPER;case'hoops':return((y>>1)&1)?INK:PAPER;case'ball':return PAPER}return PAPER}
+function darker(st,back){if(back==='same')return st;if(back==='black')return'black';return st==='white'?'dither':'black'}
+
+/* ---------------- TÊTE GÉNÉRATIVE ---------------- */
+function headSil(f,hx,hy,hw,hh,o){
+ const seed=f.geoSeed|0,bf=o.boilFrame|0;
+ const hr=mulberry32(seed*31+1),br=mulberry32((seed*977+bf*7919+13)|0);
+ const n=Math.round(f.verts),e=f.shapeN,cx=hx+hw/2,cy=hy+hh/2,pts=[];
+ const off=hr()*TAU/n, k=1/(1+f.jitter*0.6);
+ for(let i=0;i<n;i++){const a=off+i/n*TAU,c=Math.cos(a),s=Math.sin(a);
+  let x=Math.sign(c)*Math.abs(c)**(2/e),y=Math.sign(s)*Math.abs(s)**(2/e);
+  const r=(1+(hr()*2-1)*f.jitter+(br()*2-1)*f.boil)*k;x*=r;y*=r;
+  x*=1-f.taper*Math.max(0,y);
+  pts.push([cx+x*hw/2,cy+y*hh/2]);}
+ const out={head:S.poly(pts),ears:[],hair:[],ant:[],hairFill:f.hair==='buzz'?'dither':null};
+ const X=u=>hx+u*hw,Y=v=>hy+v*hh,bj=()=>(br()*2-1)*f.boil*hw*1.5;
+ const ey=Y(f.eyeY+0.1);
+ const earSides=o.threeQ?[0]:[0,1];
+ for(const s of earSides){const ex=s?hx+hw:hx;
+  if(f.ears==='round')out.ears.push(S.ell(ex,ey,Math.max(1,hw*0.11),Math.max(1,hh*0.14)));
+  else if(f.ears==='square')out.ears.push(S.rect(ex-hw*0.12,ey-hh*0.12,hw*0.24,hh*0.24));
+  else if(f.ears==='cyber')out.ears.push(S.rect(ex-hw*0.16,ey-hh*0.18,hw*0.32,hh*0.34));}
+ const H=f.hairH*hh,rr=mulberry32(seed*31+5);
+ if(f.hair==='mohawk'){out.hair.push(S.poly([[X(.4),Y(.22)],[X(.36)+bj(),Y(0)-H*.55],[X(.46)+bj(),Y(0)-H],[X(.56)+bj(),Y(0)-H*.8],[X(.64)+bj(),Y(0)-H*.45],[X(.6),Y(.22)]]))}
+ else if(f.hair==='flat'||f.hair==='buzz'){const hH=f.hair==='buzz'?hh*0.06:H*0.35;out.hair.push(S.poly([[X(-.05),Y(.34)],[X(-.03),Y(.02)-hH],[X(1.03),Y(.02)-hH],[X(1.05),Y(.34)],[X(.85),Y(.2)+bj()],[X(.15),Y(.22)+bj()]]))}
+ else if(f.hair==='spikes'){const p=[[X(-.05),Y(.34)]];const ns=3+Math.floor(rr()*4);for(let i=0;i<=ns*2;i++){const u=-.03+1.06*i/(ns*2);p.push([X(u)+bj(),i%2?Y(.1):Y(0)-H*(.5+rr()*.5)])}p.push([X(1.05),Y(.34)],[X(.5),Y(.2)]);out.hair.push(S.poly(p))}
+ else if(f.hair==='long'){const top=[[X(-.08),Y(.36)],[X(-.05),Y(.02)-H*.3],[X(1.04),Y(.02)-H*.25],[X(1.06),Y(.3)],[X(.72),Y(.17)+bj()],[X(.3),Y(.22)+bj()]];
+  if(o.threeQ){out.hair.push(S.poly([...top.slice(0,4),[X(.7),Y(.16)],[X(.24),Y(.3)],[X(.16)+bj(),Y(1.32)],[X(-.14)+bj(),Y(1.24)]]))}
+  else{out.hair.push(S.poly(top));out.hair.push(S.poly([[X(-.1),Y(.25)],[X(.1),Y(.3)],[X(.1)+bj(),Y(1.2)],[X(-.12)+bj(),Y(1.16)]]));out.hair.push(S.poly([[X(1.1),Y(.25)],[X(.9),Y(.3)],[X(.9)+bj(),Y(1.2)],[X(1.12)+bj(),Y(1.16)]]))}}
+ else if(f.hair==='bun'){out.hair.push(S.ell(X(.5)+bj(),Y(0)-H*.35,Math.max(1.5,H*.5)));out.hair.push(S.poly([[X(-.03),Y(.25)],[X(0),Y(.02)],[X(1),Y(.02)],[X(1.03),Y(.25)],[X(.5),Y(.14)]]))}
+ const aw=Math.max(1,o.lw||1);
+ if(f.antenna==='single'||f.antenna==='double'){const xs=f.antenna==='single'?[[.72,.25]]:[[.3,-.35],[.7,.35]];
+  for(const[u,tilt]of xs){const x0=X(u),y0=Y(.08),x1=x0+tilt*hh*.4+bj(),y1=Y(0)-hh*.45;out.ant.push(S.line(x0,y0,x1,y1,aw));out.ant.push(S.ell(x1,y1,Math.max(1,hw*.07)))}}
+ return out;
+}
+function headFeat(r,f,hx,hy,hw,hh,o){
+ const seed=f.geoSeed|0,bf=o.boilFrame|0,lw=o.lw||1;
+ const br=mulberry32((seed*977+bf*7919+29)|0),er=mulberry32(seed*31+2),mr=mulberry32(seed*31+3),xr=mulberry32(seed*31+4);
+ const fx=o.threeQ?hw*0.12:0,X=u=>hx+u*hw+fx,Y=v=>hy+v*hh,bj=()=>(br()*2-1)*f.boil*hw*1.5;
+ const L=(a,b,c,d,t=lw,col=INK)=>r.ink(S.line(a,b,c,d,t),col);
+ const r0=f.eyeS*hw,eyes=[];
+ const sides=f.eyeType==='mono'?[0]:[-1,1];
+ for(const s of sides){const A=f.eyeAsym;
+  const ax=(er()*2-1)*A*r0*1.2,ay=(er()*2-1)*A*r0*1.2,as=1+(er()*2-1)*A*0.45;
+  let rr=Math.max(.5,r0*as*(f.eyeType==='mono'?1.6:1));if(o.threeQ&&s<0)rr*=0.85;
+  eyes.push({s,x:X(.5+s*f.eyeSp*(o.threeQ&&s<0?0.8:1))+ax+bj(),y:Y(f.eyeY)+ay+bj(),r:rr});}
+ const look=(e,pr)=>[e.x+f.lookX*(e.r-pr)*.9,e.y+f.lookY*(e.r-pr)*.9];
+ if(f.eyeType==='visor'){const a=eyes[0],b=eyes[1],h=Math.max(1,r0*.85);
+  r.ink(S.poly([[a.x-r0*1.5,a.y-h],[b.x+r0*1.5,b.y-h],[b.x+r0*1.5,b.y+h],[a.x-r0*1.5,a.y+h]]));
+  for(const e of eyes){const[px,py]=look(e,e.r*.5);r.ink(S.rect(px-e.r*.6,py-Math.max(.5,h*.3),Math.max(1,e.r*1.2),Math.max(1,h*.6)),PAPER)}}
+ else for(const e of eyes){const{x,y,r:rr}=e;
+  switch(f.eyeType){
+   case'dot':r.ink(S.ell(x,y,rr*.7));break;
+   case'ring':r.ink(S.ring(x,y,rr,lw));break;
+   case'pupil':case'mono':{r.ink(S.ell(x,y,rr),PAPER);r.ink(S.ring(x,y,rr,lw));const pr=rr*f.pupil;const[px,py]=look(e,pr);r.ink(S.ell(px,py,pr));break}
+   case'line':L(x-rr,y,x+rr,y);break;
+   case'cross':L(x-rr,y-rr,x+rr,y+rr);L(x-rr,y+rr,x+rr,y-rr);break;
+   case'square':{r.ink(S.rect(x-rr,y-rr,rr*2,rr*2),PAPER);L(x-rr,y-rr,x+rr,y-rr);L(x+rr,y-rr,x+rr,y+rr);L(x+rr,y+rr,x-rr,y+rr);L(x-rr,y+rr,x-rr,y-rr);const pr=rr*f.pupil;const[px,py]=look(e,pr);r.ink(S.rect(px-pr,py-pr,pr*2,pr*2));break}
+  }}
+ const bt=Math.max(1,Math.round(lw*1.4));
+ if(f.brow!=='none'&&eyes.length){
+  if(f.brow==='uni'||eyes.length===1){const a=eyes[0],b=eyes[eyes.length-1];const by=Math.min(a.y,b.y)-r0*1.9;L(a.x-a.r,by+bj()*.5,b.x+b.r,by+bj()*.5,bt)}
+  else for(const e of eyes){const by=e.y-e.r-r0*0.9-lw,inner=e.s<0?e.x+e.r:e.x-e.r,outer=e.s<0?e.x-e.r:e.x+e.r;
+   const d=f.brow==='angry'?r0*.6:f.brow==='sad'?-r0*.6:0;L(outer,by-d*.4+bj()*.4,inner,by+d+bj()*.4,bt)}}
+ const nx=X(.5)+(o.threeQ?hw*.08:0)+bj(),ny0=Y((f.eyeY+f.mouthY)/2-f.noseL/2),ny1=ny0+f.noseL*hh;
+ if(f.nose==='line')L(nx,ny0,nx,ny1);
+ else if(f.nose==='L'){L(nx,ny0,nx,ny1);L(nx,ny1,nx-Math.max(1,f.noseL*hw*.6),ny1)}
+ else if(f.nose==='dots'){r.ink(S.ell(nx-hw*.04,ny1,lw*.5));r.ink(S.ell(nx+hw*.04,ny1,lw*.5))}
+ else if(f.nose==='block')r.ink(S.rect(nx-Math.max(.5,hw*.04),ny0,Math.max(1,hw*.08),Math.max(1,f.noseL*hh)));
+ const mx=X(.5+f.mouthX)+bj(),my=Y(f.mouthY)+bj(),w=Math.max(.8,f.mouthW*hw/2),op=f.mouthOpen*hh,ti=f.mouthTilt;
+ const P=(t,dy=0)=>[mx+t*w,my+t*w*ti+dy];
+ const PL=pts=>{for(let i=1;i<pts.length;i++)L(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1])};
+ switch(f.mouthType){
+  case'line':PL([P(-1),P(1)]);break;
+  case'wobble':{const p=[];for(let i=0;i<=6;i++)p.push(P(-1+i/3,(mr()*2-1)*(op*.6+hh*.025)+bj()*.4));PL(p);break}
+  case'oval':r.ink(S.ell(mx,my,w,Math.max(.6,op)));break;
+  case'teeth':case'grille':{const h=Math.max(1,op*.8);const q=[P(-1,-h),P(1,-h),P(1,h),P(-1,h)];
+   if(f.mouthType==='teeth'){r.ink(S.poly(q),PAPER);PL([...q,q[0]]);const nt=clamp(Math.round(w*2/Math.max(2,lw*3)),2,8);for(let i=1;i<nt;i++){const t=-1+2*i/nt;PL([P(t,-h),P(t,h)])}}
+   else{r.ink(S.poly(q));const nl=Math.max(1,Math.floor(h*2/(lw*2+1)));for(let i=1;i<=nl;i++){const dy=-h+2*h*i/(nl+1);L(P(-.8,dy)[0],P(-.8,dy)[1],P(.8,dy)[0],P(.8,dy)[1],lw,PAPER)}}break}
+  case'zigzag':{const nz=4+Math.floor(mr()*4),a=Math.max(.8,op*.6),p=[];for(let i=0;i<=nz;i++)p.push(P(-1+2*i/nz,(i%2?a:-a)));PL(p);break}
+  case'smile':case'frown':{const c=Math.max(1,op+hh*.04)*(f.mouthType==='smile'?1:-1),p=[];for(let i=0;i<=8;i++){const t=-1+i/4;p.push(P(t,c*(1-t*t)-c*.5))}PL(p);break}
+ }
+ const side=(seed&1)?1:-1,eS=eyes.find(e=>e.s===side)||eyes[0];
+ switch(f.implant){
+  case'plate':{const x0=X(.5+side*.14),x1=X(.5+side*.44),y0=Y(f.eyeY-.14),y1=Y(f.eyeY+.2);const a=Math.min(x0,x1),b=Math.max(x0,x1);r.ink(S.rect(a,y0,b-a,y1-y0),PAPER);PL([[a,y0],[b,y0],[b,y1],[a,y1],[a,y0]]);if(eS)r.ink(S.ell(eS.x,eS.y,Math.max(.6,eS.r*.6)));break}
+  case'eyepatch':if(eS){r.ink(S.ell(eS.x,eS.y,eS.r*1.5));L(eS.x,eS.y,X(side>0?1.05:-.05),Y(f.eyeY-.22));L(eS.x,eS.y,X(side>0?-.05:1.05),Y(f.eyeY-.3))}break;
+  case'lens':if(eS){r.ink(S.ring(eS.x,eS.y,eS.r*1.8,lw));L(eS.x+side*eS.r*1.8,eS.y,X(side>0?1.05:-.05),eS.y)}break;
+  case'barcode':{const y0=Y(f.mouthY-.22),y1=Y(f.mouthY-.08),x0=X(.5+side*.18);for(let i=0;i<6;i++){if(xr()<.35)continue;const x=x0+side*i*Math.max(1,lw);L(x,y0,x,y1,1)}break}
+  case'jack':{const jx=X(side>0?.88:.12),jy=Y(f.eyeY+.15);r.ink(S.ring(jx,jy,Math.max(1.5,hw*.07),lw));r.ink(S.ell(jx,jy,Math.max(.5,hw*.025)));break}
+ }
+ if(f.scar==='cheek'){const a=[X(.5-side*.18),Y(.56)],b=[X(.5-side*.34),Y(.7)];L(a[0],a[1],b[0],b[1]);const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];L(m[0]-hw*.04,m[1]-hh*.04,m[0]+hw*.04,m[1]+hh*.04,1)}
+ else if(f.scar==='eye'){const e=eyes.find(q=>q.s===-side)||eyes[0];if(e)L(e.x+e.r*.2,Y(f.eyeY-.17),e.x-e.r*.2,Y(f.eyeY+.19))}
+}
+
+/* ---------------- CYCLE DE MARCHE ---------------- */
+// Poses clés classiques d'une jambe sur un cycle complet (t de 0 à 1) :
+// 0 contact (talon) · .125 descente (amorti) · .25 passage (appui) · .375 montée (poussée)
+// .5 contact de l'autre jambe (celle-ci derrière) · .625 décollage · .75 passage (balancier) · .875 extension
+// th = angle de cuisse (° depuis la verticale, + = vers l'avant) ; kn = flexion du genou (+ = talon vers l'arrière)
+const WALK={
+ th:[24,15,2,-13,-24,-16,4,20],
+ kn:[2,18,6,3,12,55,60,16],
+ // hauteur de hanche relative (0 = haut) : bas après le contact, haut en montée
+ bob:[.5,1,.3,0,.5,1,.3,0],
+};
+const PHASES=['contact','descente','passage','montée'];
+// Catmull-Rom périodique sur des clés régulièrement espacées
+function cyc(keys,t){const n=keys.length;t=((t%1)+1)%1;const x=t*n,i=Math.floor(x),u=x-i;
+ const p0=keys[(i-1+n)%n],p1=keys[i%n],p2=keys[(i+1)%n],p3=keys[(i+2)%n];
+ return .5*(2*p1+(-p0+p2)*u+(2*p0-5*p1+4*p2-p3)*u*u+(-p0+3*p1-3*p2+p3)*u*u*u)}
+// démarche individuelle : v._gu = tirages fixes du passant dans [-1,1], modulés par le curseur « variété de démarche »
+const gu=(v,k)=>v&&v._gu?v._gu[k]*SET.dfGait:0;
+const gm=(v,k,range)=>Math.max(.2,1+gu(v,k)*range);
+function walkPose(t,v){
+ const s=SET.stride*gm(v,'s',.35),kb=SET.knee*gm(v,'k',.45),as=SET.armSwing*gm(v,'a',.6);
+ const thF=cyc(WALK.th,t)*s,thB=cyc(WALK.th,t+.5)*s;
+ const knF=Math.max(0,cyc(WALK.kn,t)*kb),knB=Math.max(0,cyc(WALK.kn,t+.5)*kb);
+ // bras opposés aux jambes du même côté, coude plus fléchi quand le bras passe devant
+ const aF=-cyc(WALK.th,t)*.95*as,aB=-cyc(WALK.th,t+.5)*.95*as;
+ const elF=10+Math.max(0,aF)*.9,elB=10+Math.max(0,aB)*.9;
+ // rebond : le calage au sol fait déjà monter/descendre la hanche ; on ajoute un léger affaissement
+ const sink=Math.round(cyc(WALK.bob,t)*clamp(SET.bob+Math.round(gu(v,'b')*1.5),0,3));
+ return{thF,knF,thB,knB,arF:aF,elF,arB:aB,elB,lean:1+Math.sin(TAU*t*2)*.5,lift:0,sink,ball:{x:1.15+0.12*Math.sin(TAU*t),y:0}}}
+// marche + bras avant levé qui s'agite (2 battements par cycle pour boucler proprement)
+// nombre de battements entier (1, 2 ou 3 par cycle) pour que la boucle reste propre
+function wavePose(t,v){const p=walkPose(t,v),r=gu(v,'r'),beats=r>.3?3:r<-.3?1:2,amp=gm(v,'w',.45),w=Math.sin(TAU*t*beats);
+ p.arF=133+gu(v,'h')*10+3*w*amp;p.elF=20+12*w*amp;return p}
+// marche + bâton tenu en l'air, pancarte rectangulaire en haut (léger hochement avec le pas)
+function signPose(t,v){const p=walkPose(t,v);p.arF=98+gu(v,'h')*6+2*Math.sin(TAU*t*2);p.elF=62;p.sign=true;return p}
+const ANIMS={walk:{label:'Marche',f:walkPose},wave:{label:'Marche + bras agité',f:wavePose},sign:{label:'Marche + pancarte',f:signPose}};
+const ANIM_KEYS=Object.keys(ANIMS);
+function phaseOf(k,N){const p=((k/N)%.5)*2;return PHASES[Math.round(p*4)%4]}
+
+/* ---------------- MARIONNETTE ---------------- */
+const dirV=a=>[Math.sin(a*D2R),Math.cos(a*D2R)];
+const ID={armBu:1,armBl:2,legBu:3,legBl:4,footB:5,neck:6,torso:7,ears:8,head:9,hair:10,ant:11,legFu:12,legFl:13,footF:14,skirt:15,sign:16,armFu:17,armFl:18,ball:19};
+function buildParts(b,pose,ox,oy,threeQ,lw){
+ const parts=[],thighs=[];const add=(id,sh)=>parts.push({id,sh});const fem=b.silhouette==='feminine';
+ const lean=(b.lean+pose.lean)*D2R,u=[Math.sin(lean),-Math.cos(lean)];
+ const hip=[ox,oy];
+ const leg=(th,kn,idU,idL,idF)=>{const d1=dirV(th),knee=[hip[0]+d1[0]*b.legUp,hip[1]+d1[1]*b.legUp];
+  add(idU,S.box(hip[0],hip[1],d1[0],d1[1],b.legUp,b.legW,b.legW*.4,0));add(idU,S.ell(knee[0],knee[1],b.legW/2));
+  const la=th-kn,d2=dirV(la),ank=[knee[0]+d2[0]*b.legLow,knee[1]+d2[1]*b.legLow];
+  add(idL,S.box(knee[0],knee[1],d2[0],d2[1],b.legLow,b.legW*.9,0,0));
+  const fa=clamp(-la*.7,-25,70)*D2R,fd=[Math.cos(fa),Math.sin(fa)],pn=[-Math.sin(fa),Math.cos(fa)];
+  const st=[ank[0]-fd[0]*b.legW*.5+pn[0]*(b.footH/2-.5),ank[1]-fd[1]*b.legW*.5+pn[1]*(b.footH/2-.5)];
+  const fb=S.box(st[0],st[1],fd[0],fd[1],b.footL,b.footH);add(idF,fb);thighs.push(d1);return fb.corners};
+ const fcB=leg(pose.thB,pose.knB,ID.legBu,ID.legBl,ID.footB);
+ const nrm=[-u[1],u[0]],P2=(a,p)=>[hip[0]+u[0]*a+nrm[0]*p,hip[1]+u[1]*a+nrm[1]*p];
+ if(fem){const hw=b.torsoW/2,T=b.torsoH+1,wy=T*.45;
+  add(ID.torso,S.poly([P2(-1,-hw*.86),P2(wy,-hw*.66),P2(T,-hw),P2(T,hw),P2(wy,hw*.66),P2(-1,hw*.86)]))}
+ else add(ID.torso,S.box(hip[0]-u[0],hip[1]-u[1],u[0],u[1],b.torsoH+1,b.torsoW));
+ const top=[hip[0]+u[0]*b.torsoH,hip[1]+u[1]*b.torsoH];
+ const nw=Math.max(2,Math.round(b.torsoW*.4));
+ if(b.neck>0)add(ID.neck,S.box(top[0]-u[0],top[1]-u[1],u[0],u[1],b.neck+2,nw));
+ const hb=[top[0]+u[0]*b.neck,top[1]+u[1]*b.neck];
+ const hx=Math.round(hb[0]-b.headW/2+(threeQ?1:0)),hy=Math.round(hb[1]-b.headH+1);
+ const fcF=leg(pose.thF,pose.knF,ID.legFu,ID.legFl,ID.footF);
+ if(fem){// jupe : du haut des hanches jusqu'aux 3/4 des cuisses, ses bords suivent les jambes
+  const L=b.legUp*.78,hw=b.torsoW/2,ws=b.legW*.75;
+  const pts=thighs.map(d=>[hip[0]+d[0]*L,hip[1]+d[1]*L]).sort((p,q)=>((p[0]-hip[0])*nrm[0]+(p[1]-hip[1])*nrm[1])-((q[0]-hip[0])*nrm[0]+(q[1]-hip[1])*nrm[1]));
+  const bB=[pts[0][0]-nrm[0]*ws,pts[0][1]-nrm[1]*ws],bF=[pts[1][0]+nrm[0]*ws,pts[1][1]+nrm[1]*ws];
+  add(ID.skirt,S.poly([P2(2,-hw*.88),P2(2,hw*.88),bF,bB]))}
+ const sh=[hip[0]+u[0]*(b.torsoH-b.armW*.6),hip[1]+u[1]*(b.torsoH-b.armW*.6)];
+ const arm=(a,el,idU,idL)=>{const d1=dirV(a),elb=[sh[0]+d1[0]*b.armUp,sh[1]+d1[1]*b.armUp];
+  add(idU,S.box(sh[0],sh[1],d1[0],d1[1],b.armUp,b.armW,b.armW*.4,0));add(idU,S.ell(elb[0],elb[1],b.armW/2));
+  const d2=dirV(a+el),wr=[elb[0]+d2[0]*b.armLow,elb[1]+d2[1]*b.armLow];
+  add(idL,S.box(elb[0],elb[1],d2[0],d2[1],b.armLow,b.armW*.85));add(idL,S.box(wr[0],wr[1],d2[0],d2[1],b.hand,b.hand,b.hand*.2,0));return[wr[0]+d2[0]*b.hand*.5,wr[1]+d2[1]*b.hand*.5]};
+ return{parts,arm,hx,hy,feet:[...fcB,...fcF],hip};
+}
+const femBody=v=>v.silhouette==='feminine'?{...v,legW:v.legW*.85,armW:v.armW*.85}:v;
+function renderPuppet(vals,set,animKey,t,boilFrame,withBall){
+ vals=femBody(vals);
+ const W=set.W,H=set.H,b=vals,pose=ANIMS[animKey].f(t,vals),threeQ=set.threeQ;
+ // passe 1 : trouver le sol (le pied le plus bas touche toujours le sol)
+ const g=buildParts(b,pose,0,0,threeQ);let maxY=-1e9;for(const p of g.feet)maxY=Math.max(maxY,p[1]);
+ const margin=set.outline?1:0;
+ const oy=Math.round(H-margin-.01-maxY-pose.lift),ox=Math.round(W*.42);
+ // affaissement : on plie un peu plus les deux genoux plutôt que d'enfoncer les pieds
+ if(pose.sink){pose.knF+=pose.sink*6;pose.knB+=pose.sink*6;pose.thF+=pose.sink*3;pose.thB+=pose.sink*3;
+  const g2=buildParts(b,pose,0,0,threeQ);let m2=-1e9;for(const p of g2.feet)m2=Math.max(m2,p[1]);
+  return renderAt(vals,set,pose,ox,Math.round(H-margin-.01-m2),boilFrame,withBall)}
+ return renderAt(vals,set,pose,ox,oy,boilFrame,withBall);
+}
+function renderAt(vals,set,pose,ox,oy,boilFrame,withBall){
+ const W=set.W,H=set.H,b=vals,threeQ=set.threeQ,margin=set.outline?1:0;
+ const G=buildParts(b,pose,ox,oy,threeQ);
+ G.arm(pose.arB,pose.elB,ID.armBu,ID.armBl);const handF=G.arm(pose.arF,pose.elF,ID.armFu,ID.armFl);
+ // pancarte : rectangle en haut du cadre (taille proportionnelle au cadre), bâton de la pancarte jusque sous la main
+ let sg=null;if(pose.sign){const sw=Math.max(7,Math.round(W*.42)),sh=Math.max(5,Math.round(H*.145));
+  const x0=clamp(Math.round(handF[0]-sw*.4),1,W-sw-1),y0=1;sg={x0,y0,sw,sh,sx:handF[0],sy:handF[1]+H*.09};
+  G.parts.push({id:ID.sign,sh:S.rect(x0,y0,sw,sh)})}
+ const hs=headSil(vals,G.hx,G.hy,b.headW,b.headH,{boilFrame,threeQ,lw:1});
+ hs.ears.forEach(s=>G.parts.push({id:ID.ears,sh:s}));G.parts.push({id:ID.head,sh:hs.head});
+ hs.hair.forEach(s=>G.parts.push({id:ID.hair,sh:s}));hs.ant.forEach(s=>G.parts.push({id:ID.ant,sh:s}));
+ if(withBall&&pose.ball){const br=Math.max(1.6,b.headW*.3),legL=b.legUp+b.legLow;
+  const bx=ox+pose.ball.x*legL*.7,by=H-margin-br-.01-pose.ball.y*legL*.3;G.parts.push({id:ID.ball,sh:S.ell(bx,by,br),ball:[bx,by,br]});}
+ G.parts.sort((a,c)=>a.id-c.id);
+ const r=new Ras(W,H);for(const p of G.parts)r.sil(p.sh,p.id);
+ const st={};const bk=vals.backFill;
+ st[ID.armBu]=darker(vals.armFill,bk);st[ID.armBl]=darker('white',bk);st[ID.legBu]=darker(vals.legFill,bk);st[ID.legBl]=darker(vals.sockFill,bk);st[ID.footB]=vals.footFill;
+ st[ID.neck]='white';st[ID.torso]=vals.torsoFill;st[ID.ears]=vals.ears==='cyber'?'black':'white';st[ID.head]='white';st[ID.hair]=hs.hairFill||vals.hairFill;st[ID.ant]='black';
+ const fem=vals.silhouette==='feminine';if(fem){st[ID.legBu]=darker('white',bk)}st[ID.skirt]=vals.legFill;
+ st[ID.legFu]=fem?'white':vals.legFill;st[ID.legFl]=vals.sockFill;st[ID.footF]=vals.footFill;st[ID.armFu]=vals.armFill;st[ID.armFl]='white';st[ID.ball]='ball';st[ID.sign]='white';
+ finish(r,st,()=>{r.clip=new Set([ID.head]);headFeat(r,vals,G.hx,G.hy,b.headW,b.headH,{boilFrame,threeQ,lw:1});
+  if(sg){// bâton : derrière la pancarte et la main, devant le reste (pancarte vierge)
+   r.clip=new Set(Object.values(ID).concat(0).filter(i=>i!==ID.sign&&i!==ID.armFu&&i!==ID.armFl));
+   r.ink(S.line(sg.sx,sg.y0+sg.sh,sg.sx,sg.sy,1));
+  }r.clip=new Set([ID.ball]);const bp=G.parts.find(p=>p.ball);if(bp){const[bx,by,rr]=bp.ball;r.ink(S.ell(bx+rr*.15,by-rr*.1,Math.max(.5,rr*.35)))}r.clip=null},set.outline);
+ return r;
+}
+function finish(r,st,feat,outline){
+ const{w,h,id,c}=r;
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x;if(id[i])c[i]=fillCol(st[id[i]],x,y)}
+ feat();
+ const oc=new Uint8Array(c);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x,a=id[i];
+  const nb=[x>0?id[i-1]:0,x<w-1?id[i+1]:0,y>0?id[i-w]:0,y<h-1?id[i+w]:0];
+  if(a===0){if(outline&&nb.some(v=>v>0))oc[i]=INK}
+  else if(nb.some(v=>v>0&&v<a)||(!outline&&nb.some(v=>v===0)))oc[i]=INK;}
+ r.c=oc;
+}
+function renderPortrait(vals,set,boilFrame){
+ const P=set.portRes,r=new Ras(P,P),lw=Math.max(1,Math.round(P/48));
+ const asp=vals.headH/vals.headW;let hw=P*.5,hh=hw*asp;if(hh>P*.56){hh=P*.56;hw=hh/asp}
+ const hx=Math.round((P-hw)/2),hy=Math.round(P*.24+(P*.56-hh)/2);
+ const hs=headSil(vals,hx,hy,hw,hh,{boilFrame,threeQ:false,lw});
+ const st={6:'white',7:vals.torsoFill,8:vals.ears==='cyber'?'black':'white',9:'white',10:hs.hairFill||vals.hairFill,11:'black'};
+ if(set.shoulders){const nb=hy+hh-2,sw=P*.36*(vals.torsoW/(8*(vals._sz||1)))**.5;
+  r.sil(S.rect(P/2-hw*.17,nb,hw*.34,P-nb),6);
+  r.sil(S.poly([[P/2-sw*1.15,P+1],[P/2-sw,hy+hh+P*.07],[P/2+sw,hy+hh+P*.07],[P/2+sw*1.15,P+1]]),7);}
+ hs.ears.forEach(s=>r.sil(s,8));r.sil(hs.head,9);hs.hair.forEach(s=>r.sil(s,10));hs.ant.forEach(s=>r.sil(s,11));
+ finish(r,st,()=>{r.clip=new Set([9]);headFeat(r,vals,hx,hy,hw,hh,{boilFrame,threeQ:false,lw});r.clip=null},set.outline);
+ return r;
+}
+function toImageData(r){const d=new ImageData(r.w,r.h);for(let i=0;i<r.c.length;i++){const v=r.c[i];if(!v)continue;const k=v===INK?0:255;d.data[i*4]=d.data[i*4+1]=d.data[i*4+2]=k;d.data[i*4+3]=255}return d}
+function blit(canvas,r,scale){canvas.width=r.w;canvas.height=r.h;canvas.getContext('2d').putImageData(toImageData(r),0,0);if(scale){canvas.style.width=r.w*scale+'px';canvas.style.height=r.h*scale+'px'}}
+// pelure d'oignon : image précédente en filigrane (aperçu seulement, jamais exportée)
+function blitOnion(canvas,r,prev,scale){canvas.width=r.w;canvas.height=r.h;const x=canvas.getContext('2d');
+ const d=toImageData(r);if(prev){for(let i=0;i<prev.c.length;i++){if(r.c[i]||!prev.c[i])continue;d.data[i*4]=d.data[i*4+1]=d.data[i*4+2]=prev.c[i]===INK?40:220;d.data[i*4+3]=90}}
+ x.putImageData(d,0,0);canvas.style.width=r.w*scale+'px';canvas.style.height=r.h*scale+'px'}
+const boilOf=k=>Math.floor(k/2)%3;
+
+/* ---------------- UI : PANNEAU ---------------- */
+const rowsEls={};
+function buildPanel(){
+ const pn=$('panel');pn.innerHTML='';
+ const mkSec=(title,open)=>{const ds=document.createElement('details');ds.open=open;ds.innerHTML=`<summary>${title}</summary>`;const sb=document.createElement('div');sb.className='rows';ds.appendChild(sb);pn.appendChild(ds);return sb};
+ const sl=(sb,k,label,min,max,step=1)=>{const d=document.createElement('div');d.className='set';d.innerHTML=`<label>${label}</label><input type=range min=${min} max=${max} step=${step} value=${SET[k]}><span>${SET[k]}</span>`;const i=d.querySelector('input'),o=d.querySelector('span');i.oninput=()=>{SET[k]=+i.value;o.textContent=i.value;onSet()};sb.appendChild(d)};
+ // marche
+ const mw=mkSec('Cycle de marche',true);
+ sl(mw,'frames','Images / cycle',4,16);sl(mw,'fps','FPS',2,24);
+ sl(mw,'stride','Amplitude du pas',0.3,1.6,0.05);sl(mw,'knee','Flexion genou',0.3,1.8,0.05);
+ sl(mw,'armSwing','Balancier bras',0,1.8,0.05);sl(mw,'bob','Affaissement',0,2,1);
+ const ck0=document.createElement('div');ck0.className='checks';
+ [['onion','Pelure d’oignon']].forEach(([k,l])=>{const lb=document.createElement('label');lb.innerHTML=`<input type=checkbox ${SET[k]?'checked':''}>${l}`;lb.querySelector('input').onchange=e=>{SET[k]=e.target.checked;onSet()};ck0.appendChild(lb)});
+ mw.appendChild(ck0);
+ const h0=document.createElement('div');h0.className='hint';h0.style.padding='4px 0 0';h0.textContent='8 images = les 4 poses clés (contact, descente, passage, montée) pour chaque pied. Le pied le plus bas reste calé au sol : la marche se fait sur place, prête à être déplacée par le jeu.';mw.appendChild(h0);
+ // sprite
+ const sb=mkSec('Sprite & rendu',false);
+ sl(sb,'W','Cadre largeur',12,96);sl(sb,'H','Cadre hauteur',16,128);sl(sb,'scale','Zoom aperçu',1,14);sl(sb,'portRes','Portrait (px)',24,128,4);
+ const ck=document.createElement('div');ck.className='checks';
+ [['outline','Contour'],['threeQ','Visage ¾'],['shoulders','Épaules portrait']].forEach(([k,l])=>{const lb=document.createElement('label');lb.innerHTML=`<input type=checkbox ${SET[k]?'checked':''}>${l}`;lb.querySelector('input').onchange=e=>{SET[k]=e.target.checked;onSet()};ck.appendChild(lb)});
+ const bgs=document.createElement('label');bgs.innerHTML='fond <select>'+['damier','gris','blanc','noir','gazon'].map(b=>`<option ${SET.bg===b?'selected':''}>${b}</option>`).join('')+'</select>';bgs.querySelector('select').onchange=e=>{SET.bg=e.target.value;onSet()};ck.appendChild(bgs);
+ sb.appendChild(ck);
+ for(const g of GROUPS){const det=document.createElement('details');det.open=g.id==='gabarit';
+  const sm=document.createElement('summary');sm.innerHTML=`${g.label}<span class=sp></span>`;const gl=document.createElement('button');gl.className='glock';gl.textContent='🎲 groupe';gl.title='Randomiser ce groupe seulement';
+  gl.onclick=e=>{e.preventDefault();pushUndo();const o={...V};for(const d of DEFS)if(d.g===g.id&&!d.locked){if(d.type==='n')o[d.k]=quant(d,lerp(d.lo,d.hi,rnd()));else o[d.k]=d.allowed[Math.floor(rnd()*d.allowed.length)]||o[d.k]}if(g.id==='tete')o.geoSeed=Math.floor(rnd()*1e9);V=o;refresh()};
+  const gk=document.createElement('button');gk.className='glock';gk.textContent='🔒';gk.title='Verrouiller / déverrouiller le groupe';
+  gk.onclick=e=>{e.preventDefault();const ds=DEFS.filter(d=>d.g===g.id),on=!ds.every(d=>d.locked);ds.forEach(d=>d.locked=on);syncRows();persist()};
+  sm.append(gl,gk);det.appendChild(sm);
+  const box=document.createElement('div');box.className='rows';
+  if(g.id==='tete'){const h=document.createElement('div');h.className='hint';h.style.padding='0 0 6px';h.innerHTML='curseur = valeur actuelle · min/max = règles du 🎲 · 🔒 = garder la valeur';box.appendChild(h);
+   const sr=document.createElement('div');sr.className='set';sr.innerHTML='<label>Graine géométrie</label><input type=number style="width:100%;padding:2px"><button class=lock title="nouvelle graine">↻</button>';const si=sr.querySelector('input');si.onchange=()=>{pushUndo();V.geoSeed=+si.value|0;refresh()};sr.querySelector('button').onclick=()=>{pushUndo();V.geoSeed=Math.floor(rnd()*1e9);refresh()};rowsEls.geoSeed=si;box.appendChild(sr)}
+  for(const d of DEFS.filter(d=>d.g===g.id))box.appendChild(d.type==='n'?numRow(d):enumRow(d));
+  det.appendChild(box);pn.appendChild(det);}
+ const rb=mkSec('Préréglages de règles',false);
+ const mk=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;b.style.margin='2px';rb.appendChild(b)};
+ mk('Exporter règles (.json)',()=>saveFile('bftb-regles-marche.json',new Blob([JSON.stringify({rules:rulesJSON(),SET},null,1)])));
+ mk('Importer règles',()=>{importMode='rules';$('fileIn').click()});
+ mk('Réinitialiser règles',()=>{applyRules(JSON.parse(DEFAULT_RULES));{const f=curF();for(const d of GAB){d.lo=Math.round(d.lo*f);d.hi=Math.round(d.hi*f)}applySizeBounds()}syncRows();persist();toast('Règles par défaut')});
+ mk('Tout déverrouiller',()=>{DEFS.forEach(d=>d.locked=false);syncRows();persist()});
+}
+function numRow(d){const el=document.createElement('div');el.className='row';
+ el.innerHTML=`<label title="${d.k}">${d.label}</label><input type=range min=${d.min} max=${d.max} step=${d.step}><span class=out></span><input type=number class=lo step=${d.step} title="min 🎲"><input type=number class=hi step=${d.step} title="max 🎲"><button class=lock title="verrou">🔓</button>`;
+ const[rg,lo,hi]=[el.querySelector('input[type=range]'),el.querySelector('.lo'),el.querySelector('.hi')],lk=el.querySelector('.lock');
+ rg.oninput=()=>{V[d.k]=+rg.value;el.querySelector('.out').textContent=fmt(d,V[d.k]);draw();drawStrip();persist()};
+ rg.onpointerdown=()=>pushUndo();
+ lo.onchange=()=>{d.lo=clamp(+lo.value,d.min,d.max);persist()};hi.onchange=()=>{d.hi=clamp(+hi.value,d.min,d.max);persist()};
+ lk.onclick=()=>{d.locked=!d.locked;syncRows();persist()};
+ rowsEls[d.k]={el,rg,lo,hi,lk};return el}
+function enumRow(d){const el=document.createElement('div');el.className='erow';
+ el.innerHTML=`<div class=top><label>${d.label}</label><select>${d.opts.map(o=>`<option>${o}</option>`).join('')}</select><button class=lock>🔓</button></div><div class=chips></div>`;
+ const sel=el.querySelector('select'),lk=el.querySelector('.lock'),ch=el.querySelector('.chips');
+ sel.onchange=()=>{pushUndo();V[d.k]=sel.value;draw();drawStrip();persist()};lk.onclick=()=>{d.locked=!d.locked;syncRows();persist()};
+ d.opts.forEach(o=>{const c=document.createElement('span');c.className='chip';c.textContent=o;c.title='autorisé dans le 🎲';c.onclick=()=>{const i=d.allowed.indexOf(o);if(i>=0){if(d.allowed.length>1)d.allowed.splice(i,1)}else d.allowed.push(o);syncRows();persist()};ch.appendChild(c)});
+ rowsEls[d.k]={el,sel,lk,ch};return el}
+const fmt=(d,v)=>d.step<1?(+v).toFixed(d.step<0.01?3:2):String(v);
+function syncRows(){for(const d of DEFS){const R=rowsEls[d.k];if(!R)continue;R.lk.classList.toggle('on',d.locked);R.lk.textContent=d.locked?'🔒':'🔓';R.el.classList.toggle('locked',d.locked);
+ if(d.type==='n'){R.rg.value=V[d.k];R.el.querySelector('.out').textContent=fmt(d,V[d.k]);R.lo.value=d.lo;R.hi.value=d.hi}
+ else{R.sel.value=V[d.k];[...R.ch.children].forEach(c=>c.classList.toggle('on',d.allowed.includes(c.textContent)))}}
+ if(rowsEls.geoSeed)rowsEls.geoSeed.value=V.geoSeed}
+
+/* ---------------- BOUCLE & AFFICHAGE ---------------- */
+let playing=true,frame=0,tick=0,last=0,acc=0,boilAcc=0,variants=[];
+function onSet(){document.body.className='bg-'+SET.bg;draw();drawStrip();drawGrid();if(DF.walkers.length){dfClearCache();dfSpeedCalc();if(FS.on)drawDefile()}fsSyncBar();persist()}
+function draw(){
+ const N=SET.frames,k=((frame%N)+N)%N,t=k/N,bfp=boilOf(tick);
+ const cur=renderPuppet(V,SET,SET.anim,t,bfp,SET.ball);
+ if(SET.onion){const prev=renderPuppet(V,SET,SET.anim,((k-1+N)%N)/N,bfp,SET.ball);blitOnion($('stage'),cur,prev,SET.scale)}
+ else blit($('stage'),cur,SET.scale);
+ blit($('portrait'),renderPortrait(V,SET,bfp),Math.max(2,Math.round(256/SET.portRes)));
+ $('frameLbl').textContent=`${k+1}/${N} · ${SET.W}×${SET.H}`;$('portLbl').textContent=`${SET.portRes}px · boil ${bfp+1}/3`;
+ $('phaseLbl').textContent=`${phaseOf(k,N)} · pied ${(k/N)<.5?'avant':'arrière'} en appui`;
+ [...$('phases').children].forEach((s,i)=>s.classList.toggle('cur',i===k));
+}
+function drawStrip(){const N=SET.frames,c=$('strip');c.width=SET.W*N;c.height=SET.H;const ctx=c.getContext('2d');
+ for(let k=0;k<N;k++)ctx.putImageData(toImageData(renderPuppet(V,SET,SET.anim,k/N,boilOf(k),SET.ball)),k*SET.W,0);
+ const sc=Math.max(1,Math.min(4,Math.floor(((c.parentElement.clientWidth||600)-20)/(SET.W*N))));c.style.width=c.width*sc+'px';c.style.height=c.height*sc+'px';
+ const ph=$('phases');ph.innerHTML='';ph.style.width=c.style.width;
+ for(let k=0;k<N;k++){const s=document.createElement('span');s.style.width=(SET.W*sc)+'px';s.textContent=(k+1)+' '+phaseOf(k,N);s.title='aller à cette image';s.style.cursor='pointer';s.onclick=()=>{frame=k;draw()};ph.appendChild(s)}
+ $('stripLbl').textContent=`${ANIMS[SET.anim].label} · ${N} images · ${SET.fps} fps · boucle`}
+function drawGrid(){const g=$('grid');if(!variants.length)return newGrid();
+ const mode=$('gridMode').value,bfp=boilOf(tick),N=SET.frames;
+ variants.forEach((v,i)=>{const c=g.children[i]?.firstChild;if(!c)return;
+  if(mode==='face')blit(c,renderPortrait(v,SET,bfp),Math.max(1,Math.round(96/SET.portRes)));
+  else blit(c,renderPuppet(v,SET,SET.anim,(((frame%N)+N)%N)/N,bfp,SET.ball),Math.max(1,Math.floor(100/SET.H))||1)});}
+function newGrid(){const mode=$('gridMode').value,g=$('grid');g.innerHTML='';
+ variants=[];for(let i=0;i<12;i++)variants.push(mode==='face'?randomize(['face']):mode==='body'?randomize(['body']):mode==='all'?randomize(['face','body']):mutate(V,0.18));
+ variants.forEach(v=>{const d=document.createElement('div');d.className='var';const c=document.createElement('canvas');c.className='spr';d.appendChild(c);d.onclick=()=>{pushUndo();V={...v};refresh();toast('Variante adoptée')};g.appendChild(d)});drawGrid()}
+/* ---------------- DÉFILÉ ---------------- */
+// Page Défilé : plusieurs passants, répartis sur des rangées, traversent l'écran de gauche à droite ; chacun est remplacé dès qu'il sort.
+// Vitesse de chacun = 2 longueurs de pas par cycle : le pied d'appui reste (à peu près) fixe sur le sol.
+const DF={walkers:[],count:0,libIdx:0,rowY:SET.dfRowY,rowX:SET.dfRowX,rowsCur:SET.dfRows};
+const FADE_MS=700;
+const dfSpr=document.createElement('canvas');
+function stepLen(vals){const g=buildParts(vals,walkPose(0,vals),0,0,SET.threeQ),f=g.feet;
+ const ax=(f[0][0]+f[1][0]+f[2][0]+f[3][0])/4,bx=(f[4][0]+f[5][0]+f[6][0]+f[7][0])/4;return Math.max(1,Math.abs(bx-ax))}
+function dfSpeedCalc(){for(const w of DF.walkers)w.speed=2*stepLen(w.vals)*SET.dfSpeed}
+function dfPick(){const src=SET.dfSrc;let vals,name;
+ if(src==='lib'&&LIB.length){const it=LIB[DF.libIdx%LIB.length];DF.libIdx++;vals=fitSize({...V,...it.V});name=it.name}
+ else if(src==='cur'){vals={...V};name=curName()}
+ else{vals=randomize(['face','body']);vals=Math.random()<SET.dfFem?feminize(vals):standardize(vals);name='blk_'+(vals.geoSeed>>>0).toString(36)}
+ const R=()=>Math.random()*2-1;vals={...vals,_gu:{s:R(),k:R(),a:R(),b:R(),w:R(),r:R(),h:R()}};
+ DF.count++;return{vals,name,speed:2*stepLen(vals)*SET.dfSpeed,u:Math.random()*2-1,v:Math.random(),v2:Math.random(),cache:{}}}
+const wAnim=w=>w.v<SET.dfWave?(w.v2<SET.dfSign?'sign':'wave'):'walk';
+const wF=w=>Math.max(0.2,1+w.u*SET.dfVar);
+function dfClearCache(){for(const w of DF.walkers)w.cache={}}
+// image k du passant, mise en cache (le boil suit l'image, comme sur la planche exportée)
+function dfFrame(w,k){const a=wAnim(w),key=a+k;let c=w.cache[key];if(c)return c;const rr=renderPuppet(w.vals,SET,a,k/SET.frames,boilOf(k),SET.ball);c=document.createElement('canvas');c.width=rr.w;c.height=rr.h;c.getContext('2d').putImageData(toImageData(rr),0,0);w.cache[key]=c;return c}
+const rowOff=r=>r*DF.rowX;
+// entre juste à gauche du cadre, avec un petit retard aléatoire proportionnel à l'espacement moyen de la rangée :
+// la densité reste celle du départ. Si la rangée a plus de passants que sa cible, celui qui sort n'est pas remplacé.
+function dfRespawn(w){if(w.leaving){w.dead=true;return}
+ const T=perRowTargets(),act=DF.walkers.filter(o=>o.row===w.row&&!o.leaving&&!o.dead).length;
+ if(w.row>=T.length||act>T[w.row]){w.dead=true;return}// foule réduite : il sort sans être remplacé
+ Object.assign(w,dfPick());w.k=Math.random()*SET.frames;w.a=1;w.fade=0;
+ const m=Math.max(1,DF.walkers.filter(o=>o.row===w.row&&!o.leaving).length),gap=(SET.dfW+SET.W)/m;
+ w.x=-SET.W-rowOff(w.row)-Math.random()*gap}
+const perRowTargets=()=>{const R=SET.dfRows,N=SET.dfN;return Array.from({length:R},(_,r)=>Math.floor(N/R)+(r<N%R?1:0))};
+function dfNew(r,x,fadeIn){const w={row:r,...dfPick(),k:Math.random()*SET.frames,x,a:fadeIn?0:1,fade:fadeIn?1:0};DF.walkers.push(w);return w}
+function dfReset(){DF.walkers=[];const span=SET.dfW+SET.W;
+ perRowTargets().forEach((m,r)=>{for(let i=0;i<m;i++)dfNew(r,-SET.W-r*SET.dfRowX+((i+Math.random()*0.5)/m)*span,false)});
+ DF.rowY=SET.dfRowY;DF.rowX=SET.dfRowX;DF.rowsCur=SET.dfRows;dfLabel()}
+// ajuste la foule en douceur, sur plusieurs cycles : en trop -> ils finissent leur traversée et ne sont pas remplacés (dfRespawn) ;
+// en manque -> les nouveaux entrent par la gauche, échelonnés derrière le dernier de la rangée.
+function dfSync(){const T=perRowTargets(),span=SET.dfW+SET.W;
+ T.forEach((m,r)=>{const act=DF.walkers.filter(w=>w.row===r&&!w.leaving);if(act.length>=m)return;
+  const gap=span/m;let x=Math.min(-SET.W-rowOff(r),...act.map(w=>w.x));
+  for(let i=act.length;i<m;i++){x-=gap*(0.6+Math.random()*0.8);dfNew(r,x,false)}});
+ dfLabel();DF.anim=true;if(FS.on&&!SET.fsScale){clearTimeout(FS.relay);FS.relay=setTimeout(()=>fsLayout(),900)}}
+// renouvellement en fondu croisé
+function dfRenew(){for(const w of DF.walkers)if(!w.leaving){w.leaving=true;w.fade=-1}
+ const span=SET.dfW+SET.W;perRowTargets().forEach((m,r)=>{for(let i=0;i<m;i++)dfNew(r,-SET.W-rowOff(r)+((i+Math.random()*0.7)/m)*span,true)});
+ dfLabel();DF.anim=true}
+// avance les fondus et les décalages de rangées (appelé à chaque image écran) ; renvoie true s'il faut redessiner
+function dfAnimate(dt){let busy=false;const k=Math.min(1,dt/180);
+ for(const w of DF.walkers){if(!w.fade)continue;busy=true;w.a+=w.fade*dt/FADE_MS;
+  if(w.a>=1){w.a=1;w.fade=0}if(w.a<=0){w.a=0;w.dead=true}}
+ const before=DF.walkers.length;DF.walkers=DF.walkers.filter(w=>!w.dead);if(DF.walkers.length!==before)dfLabel();
+ const maxRow=DF.walkers.reduce((m,w)=>Math.max(m,w.row),0)+1,rt=Math.max(SET.dfRows,maxRow);
+ for(const[key,tg]of[['rowY',SET.dfRowY],['rowX',SET.dfRowX],['rowsCur',rt]]){const d=tg-DF[key];if(Math.abs(d)>.02){DF[key]+=d*k;busy=true}else DF[key]=tg}
+ return busy}
+function dfLabel(){const n=DF.walkers.filter(w=>!w.leaving).length;$('dfLbl').textContent=`${n} passants${n!==SET.dfN?' → '+SET.dfN:''} · ${SET.dfRows} rangée${SET.dfRows>1?'s':''} · ${DF.count} au total`+(SET.dfSrc==='lib'&&!LIB.length?' · (bibliothèque vide → aléatoire)':'')}
+function dfStep(){if(!DF.walkers.length)dfReset();const N=SET.frames;let ch=false;
+ for(const w of DF.walkers){const f=wF(w);w.k=((w.k%N)+f)%N;w.x+=w.speed*f/N;if(w.x+rowOff(w.row)>SET.dfW){dfRespawn(w);ch=true}}
+ DF.walkers=DF.walkers.filter(w=>!w.dead);if(ch)dfLabel();drawDefile()}
+const dfH=()=>Math.round(SET.H+(DF.rowsCur-1)*DF.rowY+3);
+const dfGround=r=>Math.round(SET.H+r*DF.rowY);
+// fondu en 1-bit : masque de trame ordonnée (Bayer 4×4), 17 niveaux
+const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5],dfMasks=[];
+function dfMask(x,lv){if(!dfMasks[lv]){const c=document.createElement('canvas');c.width=c.height=4;const g=c.getContext('2d');g.fillStyle='#000';
+ for(let i=0;i<16;i++)if(BAYER[i]<lv)g.fillRect(i%4,i>>2,1,1);dfMasks[lv]=x.createPattern(c,'repeat')}return dfMasks[lv]}
+const dfTmp=document.createElement('canvas');
+function dfDraw(x,img,px,py,a){if(a>=1){x.drawImage(img,px,py);return}const lv=Math.round(a*16);if(lv<=0)return;
+ dfTmp.width=img.width;dfTmp.height=img.height;const t=dfTmp.getContext('2d');t.drawImage(img,0,0);
+ t.globalCompositeOperation='destination-in';t.fillStyle=dfMask(t,lv);t.fillRect(0,0,img.width,img.height);t.globalCompositeOperation='source-over';
+ x.drawImage(dfTmp,px,py)}
+function drawDefile(){if(!DF.walkers.length)dfReset();const c=$('fsCanvas'),W=SET.dfW,H=dfH(),N=SET.frames,ground=SET.fsGround;c.width=W;c.height=H;const x=c.getContext('2d');
+ const nR=Math.max(SET.dfRows,DF.walkers.reduce((m,w)=>Math.max(m,w.row),0)+1),last=dfGround(Math.min(nR-1,Math.round(DF.rowsCur-1)));
+ if(ground){x.fillStyle='#000';for(let y=last+1;y<H;y++)for(let i=(y&1);i<W;i+=2)x.fillRect(i,y,1,1)}
+ for(let r=0;r<nR;r++){
+  // ligne de sol de la rangée (derrière ses passants), puis les passants
+  const gy=dfGround(r);if(ground){x.fillStyle='#fff';for(let i=(r&1);i<W;i+=2)x.fillRect(i,gy,1,1)}
+  for(const w of DF.walkers.filter(w=>w.row===r).sort((a,b)=>a.x-b.x)){
+   dfDraw(x,dfFrame(w,Math.floor(w.k)%N),Math.round(w.x+rowOff(r)),gy-SET.H,w.a??1)}}
+ composeStage()}
+/* ---------------- TITRE GRIBOUILLÉ ---------------- */
+// Police manuscrite « Rock Salt » ; chaque lettre tremble (décalage + rotation) sur 3 états qui alternent toutes les 125 ms,
+// comme le boil des sprites, avec un second passage en trait décalé pour l'effet gribouillé.
+// Le titre est dessiné dans la scène, à la résolution de sortie ; ses 3 états sont mis en cache.
+const TITLE_FONT='"Rock Salt","Comic Sans MS",cursive';
+function titleLines(g,text,vw,vh){const fit=t=>{g.font=`100px ${TITLE_FONT}`;return g.measureText(t).width/100};
+ const one=Math.min(vh*.12,vw*.9/fit(text));const sp=[...text.matchAll(/ /g)].map(m=>m.index);
+ if(!sp.length)return{lines:[text],size:one};
+ const mid=text.length/2,cut=sp.reduce((a,b)=>Math.abs(b-mid)<Math.abs(a-mid)?b:a);
+ const L=[text.slice(0,cut),text.slice(cut+1)],two=Math.min(vh*.09,vw*.9/Math.max(fit(L[0]),fit(L[1])));
+ return two>one*1.3?{lines:L,size:two}:{lines:[text],size:one}}
+const titleCache=new Map();
+function titleImage(W,H,bf){const text=(SET.fsTitle||'').trim();if(!SET.fsTitleOn||!text)return null;
+ const key=[text,SET.fsTitleCol,W,H,bf,FS.fontOk].join('|');let c=titleCache.get(key);if(c)return c;
+ if(titleCache.size>12)titleCache.clear();
+ c=document.createElement('canvas');const g=c.getContext('2d');
+ const{lines,size}=titleLines(g,text,W,H),lh=size*1.45,top=H*.04;c.width=W;c.height=Math.ceil(top+lines.length*lh+size*.5);
+ g.font=`${size}px ${TITLE_FONT}`;g.textBaseline='alphabetic';g.fillStyle=g.strokeStyle=SET.fsTitleCol;g.lineJoin='round';
+ lines.forEach((ln,li)=>{const chars=[...ln];let x=(W-g.measureText(ln).width)/2;const base=top+size*1.05+li*lh;
+  chars.forEach((ch,i)=>{const cw=g.measureText(ch).width,r=mulberry32((li*977+i*131+bf*7919+17)|0),j=()=>r()*2-1;
+   if(ch.trim()){g.save();g.translate(x+cw/2,base);g.rotate(j()*.09);
+    g.fillText(ch,-cw/2+j()*size*.035,j()*size*.04);
+    g.lineWidth=Math.max(1,size*.022);g.globalAlpha=.85;g.strokeText(ch,-cw/2+j()*size*.05,j()*size*.05);g.restore()}
+   x+=cw})});
+ titleCache.set(key,c);return c}
+function drawTitle(){composeStage()}
+/* ---------------- PAGE DÉFILÉ ---------------- */
+// La scène est un seul canvas à la RÉSOLUTION DE SORTIE : fond + foule (agrandie d'un facteur entier, sans perte) + titre.
+//  - téléphone / tablette en portrait : la scène fait la taille de l'écran (en pixels physiques), réglages en barre par-dessus ;
+//  - tablette horizontale / ordinateur (FS.wide) : réglages à gauche, aperçu à droite ; la résolution se choisit
+//    (taille de l'aperçu, 1920×1080, 4K, vertical…). Si elle dépasse la place disponible, seul l'AFFICHAGE est réduit :
+//    l'image et la vidéo exportées gardent la résolution choisie.
+// SET.dfW = largeur du défilé en pixels de sprite (résolution ÷ facteur).
+const FS={on:false,sc:1,real:false,hideT:0,wide:false,W:0,H:0,fontOk:0};
+const isWide=()=>innerWidth>=900&&innerWidth>innerHeight;
+const DPR=()=>Math.min(3,devicePixelRatio||1);
+function stageRes(){const d=DPR();
+ if(!FS.wide)return[Math.round(innerWidth*d),Math.round(innerHeight*d)];
+ if(SET.res==='ecran'){const r=$('fsStageWrap').getBoundingClientRect();return[Math.max(64,Math.round(r.width*d)),Math.max(64,Math.round(r.height*d))]}
+ return[clamp(SET.resW|0,64,7680),clamp(SET.resH|0,64,7680)]}
+function fsAutoScale(){return Math.max(1,Math.floor((FS.H/3)/dfH()))}
+function fsLayout(reset){
+ const wide=isWide();if(wide!==FS.wide){FS.wide=wide;$('fs').classList.toggle('wide',wide);fsFoldSync()}
+ const[W,H]=stageRes(),st=$('fsStage');if(st.width!==W||st.height!==H){st.width=W;st.height=H}FS.W=W;FS.H=H;
+ let sc=SET.fsScale||fsAutoScale();sc=Math.max(1,Math.min(sc,Math.floor(H/dfH())||1));FS.sc=sc;
+ const w=Math.ceil(W/sc);if(reset){SET.dfW=w;dfReset()}
+ else if(w!==SET.dfW){// changement d'échelle : on garde la foule, positions remises à la nouvelle largeur
+  const k=(w+SET.W)/(SET.dfW+SET.W);for(const p of DF.walkers)p.x=(p.x+SET.W)*k-SET.W;SET.dfW=w}
+ // affichage : la scène entière tient dans la place disponible (réduite si besoin, jamais agrandie au-delà de 1:1)
+ const r=$('fsStageWrap').getBoundingClientRect(),d=DPR(),k=Math.min(r.width/W,r.height/H,1/d);
+ st.style.width=Math.round(W*k)+'px';st.style.height=Math.round(H*k)+'px';st.classList.toggle('smooth',k*d<.999);
+ $('fsResLbl').textContent=`sortie ${W}×${H}`+(k*d<.999?` · aperçu ${Math.round(k*d*100)} %`:'');
+ $('fsOutLbl').textContent=`image et vidéo en ${W}×${H} px`;
+ $('fsScaleO').textContent='×'+sc+(SET.fsScale?'':' (auto)');
+ $('fsResCustom').style.cssText=SET.res==='custom'?'':'display:none!important';
+ drawDefile()}
+// compose la scène : fond, foule (tampon en pixels de sprite, agrandi sans lissage), titre
+function composeStage(){if(!FS.on)return;const st=$('fsStage'),g=st.getContext('2d'),W=st.width,H=st.height,c=$('fsCanvas'),sc=FS.sc;
+ g.fillStyle=SET.fsBg;g.fillRect(0,0,W,H);
+ const ch=c.height*sc,y=SET.fsPos==='flex-start'?0:SET.fsPos==='center'?Math.round((H-ch)/2):H-ch;
+ g.imageSmoothingEnabled=false;g.drawImage(c,0,y,c.width*sc,ch);
+ const t=titleImage(W,H,tick%3);if(t)g.drawImage(t,0,0)}
+function fsBar(){const b=$('fsBar');b.classList.remove('hide');clearTimeout(FS.hideT);if(SET.fsFold||FS.wide)return;
+ FS.hideT=setTimeout(function h(){// on ne cache pas pendant qu'on règle (souris au-dessus ou champ actif)
+  if(FS.wide)return;
+  if(b.matches(':hover')||b.contains(document.activeElement)&&document.activeElement!==document.body){FS.hideT=setTimeout(h,1500);return}
+  b.classList.add('hide')},4000)}
+// barre repliée (téléphone) : seul le curseur « passants » reste visible (déplacé dans #fsMini, remis à sa place au dépliage)
+let dfNHome=null;
+function fsFoldSync(){const b=$('fsBar'),lab=$('dfN').closest('label'),mini=SET.fsFold&&FS.on&&!FS.wide;
+ if(!dfNHome)dfNHome={p:lab.parentNode,n:lab.nextSibling};
+ if(mini){$('fsMini').appendChild(lab)}else if(lab.parentNode!==dfNHome.p){dfNHome.p.insertBefore(lab,dfNHome.n)}
+ b.classList.toggle('mini',mini);$('fsFold').textContent=mini?'▴ réglages':'▾ replier';
+ if(mini){clearTimeout(FS.hideT);b.classList.remove('hide')}else if(FS.on)fsBar()}
+function fsMoreSync(){$('dfCtrls').classList.toggle('closed',!SET.fsMore||!FS.on);$('fsMore').textContent=SET.fsMore?'⚙ foule ▴':'⚙ foule ▾'}
+// page Défilé (page d'accueil)
+function fsOpen(){if(FS.on)return;FS.on=true;$('fs').hidden=false;document.body.style.overflow='hidden';
+ FS.wide=isWide();$('fs').classList.toggle('wide',FS.wide);
+ fsMoreSync();fsFoldSync();fsSyncBar();for(const w of DF.walkers)w.vals=fitSize(w.vals);dfClearCache();dfSpeedCalc();
+ fsLayout(!FS.inited);FS.inited=true;fsBar()}
+function fsSyncBar(){if(!$('fsFrames'))return;
+ for(const[id,k]of FS_SL){$(id).value=SET[k];$(id+'O').textContent=SET[k]}
+ $('fsExpScale').value=$('expScale').value;renderSizeTabs()}
+const FS_SL=[['fsFrames','frames'],['fsFps','fps'],['fsStride','stride'],['fsKnee','knee'],['fsArm','armSwing'],['fsBob','bob']];
+function fsReal(){const el=document.documentElement;try{if(document.fullscreenElement)document.exitFullscreen();else{const p=el.requestFullscreen&&el.requestFullscreen();if(p&&p.catch)p.catch(()=>toast('Plein écran refusé par le navigateur'))}}catch(e){toast('Plein écran indisponible ici')}}
+// page Personnages : l'éditeur (la manifestation est en pause)
+function fsClose(){if(!FS.on)return;if(FS.rec)stopRec();FS.on=false;$('fs').hidden=true;document.body.style.overflow='';fsFoldSync();
+ if(document.fullscreenElement){try{document.exitFullscreen()}catch(e){}}
+ buildPanel();renderSizeTabs();refresh();drawGrid();persist();try{scrollTo(0,0)}catch(e){}}
+/* ---------------- EXPORT DE LA SCÈNE (image, vidéo) ---------------- */
+// toujours à la résolution de sortie (FS.W×FS.H), quelle que soit la taille de l'aperçu
+function sceneShot(){composeStage();$('fsStage').toBlob(b=>saveFile(`manifestation_${FS.W}x${FS.H}.png`,b),'image/png')}
+function recType(){if(!window.MediaRecorder)return null;for(const t of['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'])
+ {try{if(MediaRecorder.isTypeSupported(t))return t}catch(e){}}return ''}
+function startRec(){const st=$('fsStage'),type=recType();
+ if(type===null||!st.captureStream)return toast('Vidéo non prise en charge par ce navigateur');
+ let stream,rec;try{stream=st.captureStream(30);rec=new MediaRecorder(stream,type?{mimeType:type,videoBitsPerSecond:clamp(FS.W*FS.H*4,2e6,40e6)}:{})}
+ catch(e){return toast('Vidéo impossible : '+(e.message||e))}
+ const chunks=[],dur=+$('fsRecDur').value,W=FS.W,H=FS.H,t0=performance.now();
+ rec.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+ rec.onstop=()=>{stream.getTracks().forEach(t=>t.stop());const mt=rec.mimeType||type||'video/webm',ext=mt.includes('mp4')?'mp4':'webm';
+  saveFile(`manifestation_${W}x${H}_${dur}s.${ext}`,new Blob(chunks,{type:mt.split(';')[0]}))};
+ FS.rec={rec,t0,dur,timer:setInterval(()=>{const e=(performance.now()-t0)/1000;$('fsRec').textContent=`■ Arrêter (${Math.max(0,Math.ceil(dur-e))} s)`;if(e>=dur)stopRec()},250)};
+ composeStage();rec.start(500);$('fsRec').textContent=`■ Arrêter (${dur} s)`;$('fsRec').classList.add('pri');toast(`Enregistrement ${W}×${H}…`)}
+function stopRec(){const R=FS.rec;if(!R)return;FS.rec=null;clearInterval(R.timer);try{R.rec.stop()}catch(e){}
+ $('fsRec').textContent='● Vidéo';$('fsRec').classList.remove('pri')}
+function initFs(){
+ $('fsClose').onclick=e=>{e.stopPropagation();fsClose()};
+ const bg=$('fsBg');bg.value=SET.fsBg;bg.oninput=()=>{SET.fsBg=bg.value;composeStage();persist()};
+ const rs=$('fsRes'),rw=$('fsResW'),rh=$('fsResH');rs.value=SET.res;rw.value=SET.resW;rh.value=SET.resH;
+ rs.onchange=()=>{SET.res=rs.value;if(/^\d+x\d+$/.test(rs.value)){[SET.resW,SET.resH]=rs.value.split('x').map(Number);rw.value=SET.resW;rh.value=SET.resH}fsLayout();persist()};
+ const rc=()=>{SET.resW=clamp(+rw.value||1920,64,7680);SET.resH=clamp(+rh.value||1080,64,7680);fsLayout();persist()};rw.onchange=rc;rh.onchange=rc;
+ rw.onkeydown=rh.onkeydown=e=>e.stopPropagation();
+ $('fsShot').onclick=e=>{e.stopPropagation();sceneShot()};
+ $('fsRec').onclick=e=>{e.stopPropagation();FS.rec?stopRec():startRec()};
+ const rd=$('fsRecDur');rd.value=SET.recDur;rd.onchange=()=>{SET.recDur=+rd.value;persist()};
+ $('fsMinus').onclick=()=>{SET.fsScale=Math.max(1,(SET.fsScale||FS.sc)-1);fsLayout();persist()};
+ $('fsPlus').onclick=()=>{SET.fsScale=(SET.fsScale||FS.sc)+1;fsLayout();persist()};
+ $('fsAuto').onclick=()=>{SET.fsScale=0;fsLayout();persist()};
+ const pos=$('fsPos');pos.value=SET.fsPos;pos.onchange=()=>{SET.fsPos=pos.value;fsLayout();persist()};
+ const gr=$('fsGround');gr.checked=SET.fsGround;gr.onchange=()=>{SET.fsGround=gr.checked;drawDefile();persist()};
+ $('fsMore').onclick=e=>{e.stopPropagation();SET.fsMore=!SET.fsMore;fsMoreSync();persist()};
+ for(const[id,k]of FS_SL)slider(id,k,onSet);
+ $('fsExpScale').onchange=()=>{$('expScale').value=$('fsExpScale').value};
+ $('fsReal').onclick=e=>{e.stopPropagation();fsReal()};
+ $('goDefile').onclick=fsOpen;
+ $('fsFold').onclick=e=>{e.stopPropagation();SET.fsFold=!SET.fsFold;fsFoldSync();persist()};
+ const tOn=$('fsTitleOn'),tTx=$('fsTitleTxt'),tCol=$('fsTitleCol');tOn.checked=SET.fsTitleOn;tTx.value=SET.fsTitle;tCol.value=SET.fsTitleCol;
+ tOn.onchange=()=>{SET.fsTitleOn=tOn.checked;composeStage();persist()};
+ tTx.oninput=()=>{SET.fsTitle=tTx.value;composeStage();persist()};tTx.onkeydown=e=>e.stopPropagation();
+ tCol.oninput=()=>{SET.fsTitleCol=tCol.value;composeStage();persist()};
+ try{document.fonts&&document.fonts.load(`40px "Rock Salt"`).then(()=>{FS.fontOk=1;titleCache.clear();composeStage()},()=>{})}catch(e){}
+ $('fs').addEventListener('pointerdown',fsBar);$('fs').addEventListener('pointermove',fsBar);
+ addEventListener('resize',()=>{if(FS.on)fsLayout()});
+ if(window.ResizeObserver)new ResizeObserver(()=>{if(FS.on&&FS.wide)fsLayout()}).observe($('fsStageWrap'));
+ document.addEventListener('fullscreenchange',()=>{FS.real=!!document.fullscreenElement});
+}
+function slider(id,k,after){const i=$(id),o=$(id+'O');i.value=SET[k];if(o)o.textContent=SET[k];
+ i.oninput=()=>{SET[k]=+i.value;if(o)o.textContent=i.value;after();persist()}}
+function initDefile(){
+ const src=$('dfSrc');src.value=SET.dfSrc;
+ src.onchange=()=>{SET.dfSrc=src.value;DF.libIdx=0;dfRenew();persist()};
+ slider('dfSpeed','dfSpeed',dfSpeedCalc);
+ slider('dfN','dfN',()=>{if(SET.dfRows>SET.dfN){SET.dfRows=SET.dfN;$('dfRows').value=SET.dfRows;$('dfRowsO').textContent=SET.dfRows}dfSync()});
+ slider('dfRows','dfRows',()=>{if(SET.dfRows>SET.dfN){SET.dfN=SET.dfRows;$('dfN').value=SET.dfN;$('dfNO').textContent=SET.dfN}dfSync()});
+ slider('dfRowY','dfRowY',()=>{DF.anim=true});
+ slider('dfVar','dfVar',()=>{});
+ slider('dfWave','dfWave',drawDefile);
+ slider('dfFem','dfFem',()=>{});
+ slider('dfSign','dfSign',drawDefile);
+ slider('dfGait','dfGait',()=>{dfClearCache();dfSpeedCalc();drawDefile()});
+ $('dfExp').onclick=exportCrowd;
+ slider('dfRowX','dfRowX',()=>{DF.anim=true});
+ $('dfSkip').onclick=dfRenew;
+ dfReset();drawDefile();initFs()}
+
+function loop(ts){const dt=Math.min(100,ts-last);last=ts;
+ if(playing){acc+=dt;boilAcc+=dt;let ch=false;
+  let dd=false;if(acc>=1000/SET.fps){acc=0;frame++;ch=true;if(FS.on){dfStep();dd=true}}
+  if(boilAcc>=125){boilAcc=0;tick++;ch=true;if(FS.on)composeStage()}
+  if(FS.on&&DF.walkers.length){const busy=dfAnimate(dt);if((busy||DF.anim)&&!dd)drawDefile();DF.anim=busy}
+  if(ch&&!FS.on){draw();if(variants.length)drawGrid()}}
+ requestAnimationFrame(loop)}
+function refresh(){syncRows();draw();drawStrip();persist()}
+
+/* ---------------- HISTORIQUE ---------------- */
+const undo=[];function pushUndo(){undo.push(JSON.stringify(V));if(undo.length>60)undo.shift()}
+function doUndo(){if(!undo.length)return toast('Rien à annuler');V=fitSize(JSON.parse(undo.pop()));refresh()}
+
+/* ---------------- EXPORT ---------------- */
+let downloads=null;
+(async()=>{try{if(window.claude&&window.claude.use)downloads=await window.claude.use('downloads')}catch(e){}})();
+async function saveFile(name,blob){
+ if(downloads){try{await downloads.save({filename:name,data:blob});toast('Enregistré : '+name)}catch(e){toast(e&&e.code==='declined'?'Annulé':'Échec : '+(e&&e.code||e))}return}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);toast('Téléchargé : '+name)}
+const canvasBlob=c=>new Promise(r=>c.toBlob(r,'image/png'));
+function scaled(src,k){if(k===1)return src;const c=document.createElement('canvas');c.width=src.width*k;c.height=src.height*k;const x=c.getContext('2d');x.imageSmoothingEnabled=false;x.drawImage(src,0,0,c.width,c.height);return c}
+function sheetFor(vals,k){const N=SET.frames,c=document.createElement('canvas');c.width=SET.W*N;c.height=SET.H*ANIM_KEYS.length;const x=c.getContext('2d');
+ ANIM_KEYS.forEach((a,row)=>{for(let f=0;f<N;f++)x.putImageData(toImageData(renderPuppet(vals,SET,a,f/N,boilOf(f),SET.ball)),f*SET.W,row*SET.H)});return scaled(c,k)}
+function portraitFor(vals,k){const P=SET.portRes,c=document.createElement('canvas');c.width=P*3;c.height=P;const x=c.getContext('2d');for(let b=0;b<3;b++)x.putImageData(toImageData(renderPortrait(vals,SET,b)),b*P,0);return scaled(c,k)}
+function metaFor(name,vals,k){const N=SET.frames;return{name,tool:'BFTB générateur de manifestation',sheet:`${name}_anims.png`,portrait:`${name}_portrait.png`,scale:k,frameW:SET.W*k,frameH:SET.H*k,framesPerAnim:N,fps:SET.fps,
+ anims:Object.fromEntries(ANIM_KEYS.map((a,row)=>[a,{row,label:ANIMS[a].label,frames:N,fps:SET.fps,loop:true,phases:Array.from({length:N},(_,i)=>phaseOf(i,N)),contactFrames:[0,Math.round(N/2)]}])),
+ inPlace:true,portraitFrame:{w:SET.portRes*k,h:SET.portRes*k,frames:3,fps:8},facing:'right',colors:{ink:'#000000',paper:'#ffffff',transparent:true},params:vals,
+ walk:{stride:SET.stride,knee:SET.knee,armSwing:SET.armSwing,bob:SET.bob},settings:{...SET}}}
+function setSize(key){if(!SIZES[key]||key===SET.size)return;const f0=curF();SET.size=key;const f=curF(),r=f/f0;
+ for(const d of GAB){d.lo=Math.round(d.lo*r);d.hi=Math.round(d.hi*r)}applySizeBounds();
+ pushUndo();V=fitSize(V);
+ SET.W=Math.round(32*f);SET.H=Math.round(48*f);SET.dfRowY=Math.max(2,Math.round(SET.dfRowY*r));
+ buildPanel();renderSizeTabs();refresh();newGrid();
+ const ry=$('dfRowY');if(ry){ry.value=SET.dfRowY;$('dfRowYO').textContent=SET.dfRowY}
+ for(const w of DF.walkers)w.vals=fitSize(w.vals);dfClearCache();dfSpeedCalc();if(FS.on)fsLayout()
+ toast(`${SIZES[key].label} : ${SET.W}×${SET.H} px`)}
+function renderSizeTabs(){for(const id of['sizeTabs','fsSizeTabs']){const t=$(id);if(!t)continue;t.innerHTML='';
+ for(const[k,z]of Object.entries(SIZES)){const b=document.createElement('button');b.className=k===SET.size?'on':'';
+  b.innerHTML=`${z.label}<small>${Math.round(32*z.f)}×${Math.round(48*z.f)}</small>`;b.onclick=e=>{e.stopPropagation();setSize(k)};t.appendChild(b)}}}
+/* ---------------- GIF ANIMÉ (1-bit + transparence) ---------------- */
+// palette : 0 transparent, 1 noir, 2 blanc ; disposal 2 pour que la transparence ne laisse pas de traces ; boucle infinie
+function lzwGif(px,B){const mcs=2,clear=4,eoi=5;B(mcs);let size=3,next=6,dict=new Map(),cur=0,bits=0;const bytes=[];
+ const emit=c=>{cur|=c<<bits;bits+=size;while(bits>=8){bytes.push(cur&255);cur>>>=8;bits-=8}};
+ emit(clear);let pre=px[0];
+ for(let i=1;i<px.length;i++){const k=px[i],key=pre*4+k,f=dict.get(key);
+  if(f!==undefined){pre=f;continue}
+  emit(pre);
+  if(next<4096){dict.set(key,next++);if(next>(1<<size)&&size<12)size++}
+  else{emit(clear);dict=new Map();size=3;next=6}
+  pre=k}
+ emit(pre);emit(eoi);if(bits>0)bytes.push(cur&255);
+ for(let i=0;i<bytes.length;i+=255){const ch=bytes.slice(i,i+255);B(ch.length);for(const b of ch)B(b)}B(0)}
+function gifEncode(frames,w,h,delayCs){const out=[];const B=v=>out.push(v),W16=v=>{B(v&255);B(v>>8&255)};
+ 'GIF89a'.split('').forEach(c=>B(c.charCodeAt(0)));W16(w);W16(h);B(0x91);B(0);B(0);
+ [0,0,0, 0,0,0, 255,255,255, 128,128,128].forEach(B);
+ B(0x21);B(0xFF);B(11);'NETSCAPE2.0'.split('').forEach(c=>B(c.charCodeAt(0)));B(3);B(1);B(0);B(0);B(0);
+ for(const px of frames){B(0x21);B(0xF9);B(4);B(0x09);W16(delayCs);B(0);B(0);
+  B(0x2C);W16(0);W16(0);W16(w);W16(h);B(0);lzwGif(px,B)}
+ B(0x3B);return new Uint8Array(out)}
+function rasIdx(r,k){const w=r.w*k,h=r.h*k,o=new Uint8Array(w*h);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const c=r.c[Math.floor(y/k)*r.w+Math.floor(x/k)];o[y*w+x]=c===INK?1:c===PAPER?2:0}return o}
+async function walkerFiles(vals,anim,base,k,fpsW){const N=SET.frames,c=document.createElement('canvas');c.width=SET.W*N;c.height=SET.H;const x=c.getContext('2d'),gf=[];
+ for(let f=0;f<N;f++){const r=renderPuppet(vals,SET,anim,f/N,boilOf(f),SET.ball);x.putImageData(toImageData(r),f*SET.W,0);gf.push(rasIdx(r,k))}
+ const png=new Uint8Array(await(await canvasBlob(scaled(c,k))).arrayBuffer());
+ const gif=gifEncode(gf,SET.W*k,SET.H*k,Math.max(2,Math.round(100/fpsW)));
+ return[[base+'.png',png],[base+'.gif',gif]]}
+// exporte chaque passant visible : un cycle complet (sa propre animation), planche PNG + GIF + manifeste JSON
+async function exportCrowd(){const vis=DF.walkers.filter(w=>{const x0=w.x+rowOff(w.row);return x0<SET.dfW&&x0+SET.W>0}).sort((a,b)=>a.row-b.row||a.x-b.x);
+ if(!vis.length)return toast('Aucun passant à l’écran');
+ toast(`Export de ${vis.length} passant${vis.length>1?'s':''}…`);
+ const k=+$('expScale').value,files=[],list=[],pad=String(vis.length).length;
+ for(let i=0;i<vis.length;i++){const w=vis[i],anim=wAnim(w),f=wF(w),fpsW=+(SET.fps*f).toFixed(2);
+  const base=`passant_${String(i+1).padStart(pad,'0')}_${w.name.replace(/[^\w\-]+/g,'_')}_${anim}`;
+  files.push(...await walkerFiles(w.vals,anim,base,k,fpsW));
+  list.push({file:base,name:w.name,anim,row:w.row,silhouette:w.vals.silhouette||'standard',frames:SET.frames,fps:fpsW,speedFactor:+f.toFixed(3),pxPerCycle:+(w.speed*k).toFixed(2),params:w.vals});
+  if(i%10===9)await new Promise(r=>setTimeout(r))}
+ files.push(['manifeste.json',new TextEncoder().encode(JSON.stringify({tool:'BFTB générateur de manifestation',date:new Date().toISOString(),scale:k,frameW:SET.W*k,frameH:SET.H*k,
+  note:'Chaque passant : un cycle complet sur place. fps = cadence propre du passant ; pxPerCycle = avance horizontale par cycle pour des pieds ancrés.',passants:list},null,1))]);
+ saveFile(`manifestation_${vis.length}_passants.zip`,zip(files))}
+function curName(){return($('nameIn').value.trim()||'blk_'+(V.geoSeed>>>0).toString(36)).replace(/[^\w\-]+/g,'_')}
+async function bundleFiles(name,vals,k,prefix=''){
+ return[[prefix+name+'_anims.png',new Uint8Array(await(await canvasBlob(sheetFor(vals,k))).arrayBuffer())],
+  [prefix+name+'_portrait.png',new Uint8Array(await(await canvasBlob(portraitFor(vals,k))).arrayBuffer())],
+  [prefix+name+'.json',new TextEncoder().encode(JSON.stringify(metaFor(name,vals,k),null,1))]]}
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(d){let c=0xFFFFFFFF;for(let i=0;i<d.length;i++)c=CRC[(c^d[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function zip(files){const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+ for(const[name,data]of files){const nb=enc.encode(name),crc=crc32(data),h=new DataView(new ArrayBuffer(30));
+  h.setUint32(0,0x04034b50,true);h.setUint16(4,20,true);h.setUint32(14,crc,true);h.setUint32(18,data.length,true);h.setUint32(22,data.length,true);h.setUint16(26,nb.length,true);
+  parts.push(new Uint8Array(h.buffer),nb,data);
+  const c=new DataView(new ArrayBuffer(46));c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint32(16,crc,true);c.setUint32(20,data.length,true);c.setUint32(24,data.length,true);c.setUint16(28,nb.length,true);c.setUint32(42,off,true);
+  cen.push(new Uint8Array(c.buffer),nb);off+=30+nb.length+data.length}
+ const cs=cen.reduce((s,a)=>s+a.length,0),e=new DataView(new ArrayBuffer(22));e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
+ return new Blob([...parts,...cen,new Uint8Array(e.buffer)],{type:'application/zip'})}
+
+/* ---------------- BIBLIOTHÈQUE ---------------- */
+let LIB=load('bftb-walk-lib',[]);
+function thumb(vals){const s={...SET,portRes:48};const c=document.createElement('canvas');blit(c,renderPortrait(vals,s,0));return c.toDataURL()}
+function renderLib(){const L=$('lib');L.innerHTML='';$('libCount').textContent=LIB.length;
+ if(!LIB.length){L.innerHTML='<div class=empty>Rien de gardé pour l’instant. Randomise, puis « Garder » (S) quand un perso te plaît. Tu peux aussi importer le JSON de bibliothèque de l’atelier d’origine.</div>';return}
+ LIB.slice().reverse().forEach(it=>{const d=document.createElement('div');d.className='libitem';
+  d.innerHTML=`<img src="${it.thumb}" title="charger"><div><div class=nm>${it.name}</div><div class=acts><button data-a=load>charger</button><button data-a=zip>zip</button><button data-a=del>✕</button></div></div>`;
+  d.querySelector('img').onclick=()=>act('load');d.querySelectorAll('button').forEach(b=>b.onclick=()=>act(b.dataset.a));
+  async function act(a){if(a==='load'){pushUndo();V=fitSize({...V,...it.V});$('nameIn').value=it.name;refresh();toast('Chargé : '+it.name)}
+   else if(a==='del'){LIB=LIB.filter(x=>x!==it);store('bftb-walk-lib',LIB);renderLib()}
+   else if(a==='zip'){const k=+$('expScale').value;saveFile(it.name+'.zip',zip(await bundleFiles(it.name,fitSize({...V,...it.V}),k)))}}
+  L.appendChild(d)})}
+function keep(){let name=curName();if(LIB.some(x=>x.name===name))name+='_'+(LIB.length+1);
+ LIB.push({name,V:{...V},thumb:thumb(V),date:new Date().toISOString()});store('bftb-walk-lib',LIB);renderLib();$('nameIn').value='';toast('Gardé : '+name)}
+
+/* ---------------- CÂBLAGE ---------------- */
+let importMode='lib';
+function init(){
+ if(!ANIMS[SET.anim])SET.anim='walk';
+ SET.ball=false;
+ renderSizeTabs();
+ buildPanel();
+ const as=$('animSel');ANIM_KEYS.forEach(k=>{const o=document.createElement('option');o.value=k;o.textContent=ANIMS[k].label;as.appendChild(o)});as.value=SET.anim;
+ as.onchange=()=>{SET.anim=as.value;draw();drawStrip();drawGrid();persist()};
+ $('bAll').onclick=()=>{pushUndo();V=randomize(['face','body']);refresh()};
+ $('bFace').onclick=()=>{pushUndo();V=randomize(['face']);refresh()};
+ $('bBody').onclick=()=>{pushUndo();V=randomize(['body']);refresh()};
+ $('bMut').onclick=()=>{pushUndo();V=mutate(V);refresh()};
+ $('bUndo').onclick=doUndo;$('bKeep').onclick=keep;
+ $('bPlay').onclick=()=>{playing=!playing;$('bPlay').firstChild.textContent=playing?'⏸':'▶'};
+ $('bStep').onclick=()=>{frame++;tick++;draw()};
+ $('bPrev').onclick=()=>{frame--;tick++;draw()};
+ $('bGrid').onclick=newGrid;$('gridMode').onchange=newGrid;
+ const k=()=>+$('expScale').value;
+ $('bExpSheet').onclick=async()=>saveFile(curName()+'_anims.png',await canvasBlob(sheetFor(V,k())));
+ $('bExpPort').onclick=async()=>saveFile(curName()+'_portrait.png',await canvasBlob(portraitFor(V,k())));
+ $('bExpJson').onclick=()=>saveFile(curName()+'.json',new Blob([JSON.stringify(metaFor(curName(),V,k()),null,1)]));
+ $('bExpZip').onclick=async()=>saveFile(curName()+'.zip',zip(await bundleFiles(curName(),V,k())));
+ $('bLibZip').onclick=async()=>{if(!LIB.length)return toast('Bibliothèque vide');let all=[];for(const it of LIB)all=all.concat(await bundleFiles(it.name,fitSize({...V,...it.V}),k(),it.name+'/'));
+  all.push(['bibliotheque.json',new TextEncoder().encode(JSON.stringify(LIB.map(({thumb,...r})=>r),null,1))]);saveFile('bftb_marche_bibliotheque.zip',zip(all))};
+ $('bLibAtlas').onclick=async()=>{if(!LIB.length)return toast('Bibliothèque vide');const P=SET.portRes,cols=Math.ceil(Math.sqrt(LIB.length)),rows=Math.ceil(LIB.length/cols),c=document.createElement('canvas');c.width=cols*P;c.height=rows*P;const x=c.getContext('2d');
+  LIB.forEach((it,i)=>x.putImageData(toImageData(renderPortrait(fitSize({...V,...it.V}),SET,0)),(i%cols)*P,Math.floor(i/cols)*P));
+  saveFile('bftb_atlas_portraits.png',await canvasBlob(scaled(c,k())))};
+ $('bLibJson').onclick=()=>saveFile('bftb_marche_bibliotheque.json',new Blob([JSON.stringify(LIB.map(({thumb,...r})=>r),null,1)]));
+ $('bLibImp').onclick=()=>{importMode='lib';$('fileIn').click()};
+ $('fileIn').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());
+  if(importMode==='rules'){if(j.rules)applyRules(j.rules);if(j.SET){Object.assign(SET,j.SET);SET.ball=false;if(!ANIMS[SET.anim])SET.anim='walk';$('animSel').value=SET.anim}buildPanel();refresh();toast('Règles importées')}
+  else{const arr=Array.isArray(j)?j:[j];arr.forEach(it=>{if(it.V||it.params){const v={...V,...(it.V||it.params)};if(v._sz==null)v._sz=1;LIB.push({name:it.name||'import',V:v,thumb:thumb(v),date:it.date||new Date().toISOString()})}});store('bftb-walk-lib',LIB);renderLib();toast(arr.length+' importé(s)')}}catch(err){toast('JSON invalide')}e.target.value=''};
+ document.addEventListener('keydown',e=>{if(FS.on){if(e.key===' '&&!e.target.matches('input,select,textarea')){e.preventDefault();$('bPlay').click()}return}if(e.target.matches('input,select,textarea'))return;const K=e.key.toLowerCase();
+  if(K==='r')$('bAll').click();else if(K==='f')$('bFace').click();else if(K==='b')$('bBody').click();else if(K==='m')$('bMut').click();
+  else if(K==='z')doUndo();else if(K==='s'){e.preventDefault();keep()}else if(K==='g')newGrid();else if(K===' '){e.preventDefault();$('bPlay').click()}
+  else if(K==='arrowright'){frame++;draw()}else if(K==='arrowleft'){frame--;draw()}});
+ document.body.className='bg-'+SET.bg;
+ refresh();newGrid();renderLib();initDefile();fsOpen();requestAnimationFrame(loop);
+}
+init();
+</script>
+</body>
+</html>
